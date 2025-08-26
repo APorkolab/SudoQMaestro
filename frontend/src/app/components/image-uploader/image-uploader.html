@@ -1,0 +1,25 @@
+<div class="uploader-container">
+  <h3>Upload a Sudoku Image</h3>
+  <p>Upload a clear image of a Sudoku puzzle to get it solved by the AI.</p>
+
+  <div class="upload-area">
+    <label for="file-upload" class="custom-file-upload">
+      Choose File
+    </label>
+    <input id="file-upload" type="file" accept="image/*" (change)="onFileSelected($event)">
+    <span *ngIf="selectedFile" class="file-name">{{ selectedFile.name }}</span>
+  </div>
+
+  <div *ngIf="previewUrl" class="image-preview">
+    <img [src]="previewUrl" alt="Image Preview">
+  </div>
+
+  <button (click)="onUpload()" [disabled]="!selectedFile || isLoading" class="upload-button">
+    <span *ngIf="!isLoading">Solve from Image</span>
+    <span *ngIf="isLoading">Solving...</span>
+  </button>
+
+  <div *ngIf="error" class="error-message">
+    {{ error }}
+  </div>
+</div>
