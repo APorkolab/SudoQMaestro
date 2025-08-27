@@ -98,7 +98,7 @@ The target implementation is a web application built with Angular, JavaScript, J
 - **Frontend**: Angular with interactive Sudoku grid components.  
 - **Backend**: Express.js APIs handling image processing, OCR, puzzle solving, and admin features.  
 - **Database**: MongoDB schemas for users, puzzles, and roles.  
-- **Image Processing**: OpenCV + Tesseract.js integration.  
+- **Image Processing**: Tesseract.js integration.  
 - **OAuth2 Integration**: Secure login via Passport.js with JWT tokens.  
 
 ---
@@ -113,7 +113,6 @@ The target implementation is a web application built with Angular, JavaScript, J
 
 ### 5. **Technical Details**
 
-- **OpenCV**: Preprocessing (contrast, noise reduction, edge detection).  
 - **Tesseract.js**: OCR for digit recognition.  
 - **Angular Components**: Dynamic Sudoku grid, validation feedback.  
 - **jsPDF / HTML-to-image**: Export puzzles/solutions.  
