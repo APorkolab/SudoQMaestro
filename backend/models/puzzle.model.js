@@ -1,6 +1,11 @@
 import mongoose from 'mongoose';
 
 const PuzzleSchema = new mongoose.Schema({
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true,
+  },
   puzzleGrid: {
     type: [[Number]],
     required: true,

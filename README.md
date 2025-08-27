@@ -38,6 +38,11 @@ Van egy alkalmazásötletem, amely két fő funkcióra épülne. Az első funkci
     
     -   A felhasználó által generált vagy megoldott rejtvények mentése egy adatbázisba (MongoDB).
     -   Korábban mentett rejtvények betöltése és újra megoldása.
+
+    ##### API Végpontok
+
+    -   `POST /api/puzzles`: Elment egy új rejtvényt a bejelentkezett felhasználóhoz. A request body-nak tartalmaznia kell a `puzzleGrid`, `solutionGrid` és `difficulty` mezőket.
+    -   `GET /api/puzzles`: Visszaadja a bejelentkezett felhasználó által mentett összes rejtvény listáját.
 -   **Helyességellenőrzés:**
     
     -   A felhasználó által megadott számok valós idejű ellenőrzése, hibák vizuális jelzésével.
@@ -52,6 +57,14 @@ Van egy alkalmazásötletem, amely két fő funkcióra épülne. Az első funkci
     -   **Felhasználók létrehozása, szerkesztése és törlése:** Az adminisztrátor képes új felhasználókat létrehozni, szerkeszteni vagy törölni.
     -   **Felhasználói jogosultságok kezelése:** Az adminisztrátor különböző szerepköröket oszthat ki (pl. adminisztrátor, normál felhasználó).
     -   **Felhasználói aktivitás nyomon követése:** Az adminisztrátorok megtekinthetik a felhasználók aktivitását, például a bejelentkezések számát és a megoldott rejtvényeket.
+
+    ##### API Végpontok
+
+    -   `GET /api/admin/users`: Visszaadja az összes felhasználó listáját.
+    -   `PUT /api/admin/users/:id`: Módosítja egy felhasználó adatait. Jelenleg a `role` mező módosítására van lehetőség (`{ "role": "admin" }` vagy `{ "role": "user" }`).
+    -   `DELETE /api/admin/users/:id`: Töröl egy felhasználót az adatbázisból.
+    -   `GET /api/admin/puzzles`: Visszaadja az összes mentett rejtvény listáját, a felhasználói adatokkal együtt.
+    -   `DELETE /api/admin/puzzles/:id`: Töröl egy rejtvényt az adatbázisból az azonosítója alapján.
 -   **Mentett rejtvények kezelése:**
     
     -   **Rejtvények megtekintése, szerkesztése és törlése:** Az adminisztrátorok megtekinthetik, szerkeszthetik vagy törölhetik a felhasználók által mentett rejtvényeket.
@@ -179,3 +192,21 @@ Van egy alkalmazásötletem, amely két fő funkcióra épülne. Az első funkci
 ### Összegzés
 
 Ez a részletes megvalósítási terv átfogóan bemutatja az alkalmazás összes funkcióját, az adminisztrációs felületet, az OAuth2 alapú autentikációt, valamint a technikai részleteket, amelyek a sikeres fejlesztéshez szükségesek. A terv alapján az alkalmazás teljes mértékben képes lesz a sodoku rejtvények felismerésére, megoldására, generálására és a felhasználók kezelésére egy biztonságos és felhasználóbarát környezetben.
+
+---
+
+## Adminisztrátori Eszközök
+
+### Admin Jogosultság Adása
+
+A projekt tartalmaz egy parancssori szkriptet, amellyel egy felhasználónak adminisztrátori jogosultságot lehet adni. Ehhez a felhasználónak már léteznie kell az adatbázisban (azaz legalább egyszer be kell jelentkeznie az alkalmazásba).
+
+**Használat:**
+
+A `backend` könyvtárból futtassa a következő parancsot, a `<user-email>` helyére a felhasználó email címét beírva:
+
+```bash
+node scripts/assign-admin.js <user-email>
+```
+
+Ez a szkript megkeresi a felhasználót az email címe alapján, és a `role` mezőjét `'admin'`-ra állítja.

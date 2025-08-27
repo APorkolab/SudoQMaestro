@@ -89,7 +89,7 @@ describe('Sudoku API Routes', () => {
     it('should return an error when uploading a non-image file', async () => {
         const res = await request(app)
             .post('/api/sudoku/solve-from-image')
-            .attach('sudokuImage', 'test-image.txt');
+            .attach('sudokuImage', 'api/test-image.txt');
 
         // The service should fail gracefully. Depending on the error, it might be 400 or 500.
         // The main thing is that the server does not crash.
