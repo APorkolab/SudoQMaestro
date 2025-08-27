@@ -1,0 +1,15 @@
+<div class="controls">
+  <button (click)="loadNewPuzzle('easy')">New Easy Game</button>
+  <button (click)="loadNewPuzzle('medium')">New Medium Game</button>
+  <button (click)="loadNewPuzzle('hard')">New Hard Game</button>
+</div>
+
+<app-image-uploader (onSolveSuccess)="onPuzzleSolvedFromImage($event)"></app-image-uploader>
+
+<div class="grid-container">
+  <app-sudoku-grid [grid]="puzzleState()?.puzzle ?? null" [readonly]="true"></app-sudoku-grid>
+</div>
+
+<footer>
+  <p>Built with Angular & Express</p>
+</footer>

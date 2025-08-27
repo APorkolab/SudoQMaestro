@@ -2,21 +2,18 @@
   <header class="header">
     <h1>SudoQMaestro</h1>
     <p>AI-Powered Sudoku Solver</p>
+    <div class="auth-controls">
+      @if (authService.currentUser() === undefined) {
+        <p>Loading user...</p>
+      } @else if (authService.currentUser(); as user) {
+        <span>Welcome, <a routerLink="/profile">{{ user.displayName }}</a></span>
+        <button (click)="authService.logout()">Logout</button>
+      } @else {
+        <button (click)="authService.login()">Login with Google</button>
+      }
+    </div>
   </header>
 
-  <div class="controls">
-    <button (click)="loadNewPuzzle('easy')">New Easy Game</button>
-    <button (click)="loadNewPuzzle('medium')">New Medium Game</button>
-    <button (click)="loadNewPuzzle('hard')">New Hard Game</button>
-  </div>
+  <router-outlet></router-outlet>
 
-  <app-image-uploader (onSolveSuccess)="onPuzzleSolvedFromImage($event)"></app-image-uploader>
-
-  <div class="grid-container">
-    <app-sudoku-grid [grid]="puzzleState()?.puzzle ?? null" [readonly]="true"></app-sudoku-grid>
-  </div>
-
-  <footer>
-    <p>Built with Angular & Express</p>
-  </footer>
 </main>
