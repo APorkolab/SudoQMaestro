@@ -28,7 +28,9 @@ updates:
         patterns:
           - "*"
         update-types:
-          - "security"
+          - "major"
+          - "minor"
+          - "patch"
 
   # Enable version updates for npm in frontend
   - package-ecosystem: "npm"
@@ -58,7 +60,9 @@ updates:
         patterns:
           - "*"
         update-types:
-          - "security"
+          - "major"
+          - "minor"
+          - "patch"
 
   # Enable version updates for GitHub Actions
   - package-ecosystem: "github-actions"
