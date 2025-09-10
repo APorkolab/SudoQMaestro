@@ -56,7 +56,7 @@ export class PerformanceMonitorService {
     maxBatchDelay: 30000 // 30 seconds
   };
 
-  private metricsQueue: PerformanceMetrics[] = [];
+  private metricsQueue: Record<string, unknown>[] = [];
   private observer?: PerformanceObserver;
   private longTaskObserver?: PerformanceObserver;
 
@@ -115,7 +115,7 @@ export class PerformanceMonitorService {
 
     // First Input Delay (FID)
     this.observePerformanceEntry('first-input', (entries) => {
-      const fidEntry = entries[0];
+      const fidEntry = entries[0] as PerformanceEventTiming;
       this.metrics.fid = fidEntry.processingStart - fidEntry.startTime;
     });
 
@@ -165,7 +165,7 @@ export class PerformanceMonitorService {
       url: window.location.pathname,
       timestamp: Date.now(),
       userAgent: navigator.userAgent
-    });
+    } as Record<string, unknown>);
   }
 
   private startResourceMonitoring(): void {
