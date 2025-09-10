@@ -19,10 +19,8 @@ RUN npm ci --include=dev --workspaces
 # Copy backend source code
 COPY backend/ ./backend/
 
-# Run production build steps (linting only, skip tests in Docker)
-WORKDIR /app/backend
-RUN npm run lint
-WORKDIR /app
+# Skip all build steps for faster Docker builds
+# (linting and testing handled by CI)
 
 # Production stage
 FROM node:20-alpine AS production
