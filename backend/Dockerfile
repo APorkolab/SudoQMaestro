@@ -12,6 +12,8 @@ COPY package*.json ./
 COPY backend/package*.json ./backend/
 
 # Install all dependencies from workspace root
+# Set CI=true to skip interactive husky install
+ENV CI=true
 RUN npm ci --include=dev --workspaces
 
 # Copy backend source code
@@ -42,7 +44,8 @@ COPY package*.json ./
 COPY backend/package*.json ./backend/
 
 # Install only production dependencies for workspace
-RUN npm ci --omit=dev --workspaces && \
+# Skip scripts (including prepare/husky) in production
+RUN npm ci --omit=dev --ignore-scripts --workspaces && \
     npm cache clean --force
 
 # Copy backend application files from builder
