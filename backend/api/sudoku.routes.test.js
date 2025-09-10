@@ -1,7 +1,5 @@
-import { describe, it, expect, beforeAll, afterAll, jest } from '@jest/globals';
 import request from 'supertest';
 import express from 'express';
-import mongoose from 'mongoose';
 
 import sudokuRoutes from './sudoku.routes.js'; // The router we want to test
 
@@ -9,19 +7,6 @@ import sudokuRoutes from './sudoku.routes.js'; // The router we want to test
 const app = express();
 app.use(express.json());
 app.use('/api/sudoku', sudokuRoutes);
-
-// Mock the database connection before running tests
-beforeAll(async () => {
-    // For integration tests, it's better to use an in-memory database,
-    // but for now, we'll just ensure mongoose doesn't throw errors.
-    // We can spy on connect and mock it.
-    jest.spyOn(mongoose, 'connect').mockImplementation(() => Promise.resolve());
-});
-
-afterAll(() => {
-    // Restore the original mongoose.connect after all tests
-    mongoose.connect.mockRestore();
-});
 
 
 describe('Sudoku API Routes', () => {
@@ -84,7 +69,8 @@ describe('Sudoku API Routes', () => {
     it('should return 400 if no file is uploaded', async () => {
         const res = await request(app).post('/api/sudoku/solve-from-image');
         expect(res.statusCode).toEqual(400);
-        expect(res.body.msg).toEqual('No image file uploaded.');
+        expect(res.body.success).toBe(false);
+        expect(res.body.error).toEqual('No file uploaded');
     });
 
     it('should return an error when uploading a non-image file', async () => {
@@ -92,12 +78,12 @@ describe('Sudoku API Routes', () => {
             .post('/api/sudoku/solve-from-image')
             .attach('sudokuImage', 'api/test-image.txt');
 
-        // The service should fail gracefully. Depending on the error, it might be 400 or 500.
-        // The main thing is that the server does not crash.
-        // Our placeholder returns 400, but a real failure in Jimp might be 500.
-        // Let's expect that it's a client-side error for now.
+        // The validation middleware should catch non-image files
         expect(res.statusCode).toBe(400);
-        expect(res.body.msg).toEqual('Could not solve puzzle from image.');
+        expect(res.body.success).toBe(false);
+        expect(res.body.error).toEqual('File validation failed');
+        expect(res.body.details).toHaveLength(1);
+        expect(res.body.details[0].field).toEqual('mimetype');
     });
   });
 });

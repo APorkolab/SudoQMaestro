@@ -53,7 +53,6 @@ export class ImageUploaderComponent {
         const errorMessage = err.error?.msg || err.message || 'Failed to solve puzzle from image.';
         this.error = errorMessage;
         this.uploadError.emit(errorMessage);
-        console.error('Image solve error:', err);
       }
     });
   }

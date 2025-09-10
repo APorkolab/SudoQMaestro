@@ -48,7 +48,7 @@ describe('GlobalErrorHandler', () => {
 
   it('should handle chunk load errors', () => {
     const error = new Error('Loading chunk failed');
-    error.name = 'ChunkLoadError';
+    (error as { name?: string }).name = 'ChunkLoadError';
 
     spyOn(console, 'error');
     service.handleError(error);
@@ -58,6 +58,7 @@ describe('GlobalErrorHandler', () => {
 
   it('should handle network errors', () => {
     const error = new TypeError('Failed to fetch');
+    (error as { name?: string }).name = 'TypeError';
 
     spyOn(console, 'error');
     service.handleError(error);

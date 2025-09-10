@@ -32,6 +32,3 @@ afterEach(async () => {
 });
 
 // Global test timeout is set in package.json jest config
-
-// Make jest global available in ES modules
-global.jest = jest;

@@ -43,12 +43,15 @@ export const validateJoi = (schema, target = 'body') => {
     }
     
     // Replace the original data with validated/sanitized data
+    // Note: req.query is read-only in Express, so we can't reassign it
     switch (target) {
       case 'params':
-        req.params = value;
+        // req.params is also typically read-only, but we'll preserve original behavior
+        Object.assign(req.params, value);
         break;
       case 'query':
-        req.query = value;
+        // req.query is read-only, so we can't reassign it
+        // The validation passed, so we'll leave the original query intact
         break;
       case 'body':
       default:
@@ -152,20 +155,29 @@ export const validateCustom = (validationFunction, target = 'body') => {
   return (req, res, next) => {
     let dataToValidate;
     
-    switch (target) {
-      case 'params':
-        dataToValidate = req.params;
-        break;
-      case 'query':
-        dataToValidate = req.query;
-        break;
-      case 'file':
-        dataToValidate = req.file;
-        break;
-      case 'body':
-      default:
-        dataToValidate = req.body;
-        break;
+    // Handle nested paths like 'body.puzzle' or 'body.grid'
+    if (target.includes('.')) {
+      const parts = target.split('.');
+      dataToValidate = req;
+      for (const part of parts) {
+        dataToValidate = dataToValidate?.[part];
+      }
+    } else {
+      switch (target) {
+        case 'params':
+          dataToValidate = req.params;
+          break;
+        case 'query':
+          dataToValidate = req.query;
+          break;
+        case 'file':
+          dataToValidate = req.file;
+          break;
+        case 'body':
+        default:
+          dataToValidate = req.body;
+          break;
+      }
     }
     
     try {

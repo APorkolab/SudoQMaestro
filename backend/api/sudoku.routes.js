@@ -123,7 +123,7 @@ const upload = multer({ storage });
 router.post('/solve', 
   solveLimiter,
   validateJoi(solvePuzzleSchema),
-  validateCustom(validateSudokuRules, 'body'),
+  validateCustom(validateSudokuRules, 'body.grid'),
   (req, res) => {
   const { grid } = req.body;
   // Validation middleware already handled grid validation

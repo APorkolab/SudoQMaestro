@@ -22,17 +22,17 @@ export class GlobalErrorHandler implements ErrorHandler {
     if (errorObj?.error?.error) {
       // API error with structured response
       userMessage = errorObj.error.error;
-    } else if (errorObj?.message) {
-      // Standard error with message
-      if (this.isUserFriendlyError(errorObj.message)) {
-        userMessage = errorObj.message;
-      }
     } else if (errorObj?.name === 'ChunkLoadError') {
       // Code splitting/lazy loading errors
       userMessage = 'Failed to load application resources. Please refresh the page.';
     } else if (errorObj?.name === 'TypeError' && errorObj?.message?.includes('fetch')) {
       // Network errors
       userMessage = 'Network connection error. Please check your internet connection.';
+    } else if (errorObj?.message) {
+      // Standard error with message
+      if (this.isUserFriendlyError(errorObj.message)) {
+        userMessage = errorObj.message;
+      }
     }
 
     // Show user-friendly notification

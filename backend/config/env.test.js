@@ -2,7 +2,7 @@ describe('Environment Configuration', () => {
   const originalEnv = process.env;
 
   beforeEach(() => {
-    jest.resetModules();
+    // Reset environment without jest.resetModules()
     process.env = { ...originalEnv };
   });
 

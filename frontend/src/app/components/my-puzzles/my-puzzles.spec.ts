@@ -31,8 +31,7 @@ describe('MyPuzzlesComponent', () => {
 
     fixture = TestBed.createComponent(MyPuzzlesComponent);
     component = fixture.componentInstance;
-    sudokuService = TestBed.inject(SudokuApiService) as jasmine.SpyObj<SudokuApiService>;
-    authService = TestBed.inject(AuthService) as jasmine.SpyObj<AuthService>;
+    // Note: Services are mocked and injected in beforeEach
   });
 
   it('should create', () => {

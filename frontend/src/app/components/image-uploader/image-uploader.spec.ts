@@ -47,13 +47,13 @@ describe('ImageUploaderComponent', () => {
     const mockFile = new File([''], 'test.png', { type: 'image/png' });
     const mockSolution = [[9]];
     mockSudokuApiService.solveFromImage.and.returnValue(of({ solution: mockSolution }));
-    spyOn(component.onSolveSuccess, 'emit');
+    spyOn(component.solveSuccess, 'emit');
 
     component.selectedFile = mockFile;
     component.onUpload();
 
     expect(sudokuApiService.solveFromImage).toHaveBeenCalledWith(mockFile);
-    expect(component.onSolveSuccess.emit).toHaveBeenCalledWith(mockSolution);
+    expect(component.solveSuccess.emit).toHaveBeenCalledWith(mockSolution);
     expect(component.isLoading).toBe(false);
   });
 

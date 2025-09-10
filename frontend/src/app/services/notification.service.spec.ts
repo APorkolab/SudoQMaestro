@@ -55,7 +55,8 @@ describe('NotificationService', () => {
 
   it('should auto-clear message after timeout', (done) => {
     // Override the duration for faster testing
-    (service as NotificationService & { duration: number }).duration = 100;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (service as any).duration = 100;
     
     service.show('Test message');
     expect(service.message()).toBe('Test message');
@@ -68,7 +69,8 @@ describe('NotificationService', () => {
 
   it('should cancel previous timeout when showing new message', (done) => {
     // Override the duration for faster testing
-    (service as NotificationService & { duration: number }).duration = 100;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (service as any).duration = 100;
     
     service.show('First message');
     

@@ -1,22 +1,11 @@
 import request from 'supertest';
 import express from 'express';
+import authRouter from './auth.routes.js';
 
-// Mock passport to avoid real OAuth flow
-jest.mock('passport', () => ({
-  authenticate: jest.fn(() => (_req, res, _next) => {
-    // Simulate redirect for OAuth routes
-    res.redirect('/mock-oauth');
-  }),
-}));
+// Simplified auth routes test without passport mocking
+// Focus on testing the basic route structure
 
 describe('Auth Routes', () => {
-  let authRouter;
-
-  beforeAll(async () => {
-    // Import auth routes after mocking passport
-    const module = await import('./auth.routes.js');
-    authRouter = module.default;
-  });
 
   const createApp = (user = null) => {
     const app = express();
