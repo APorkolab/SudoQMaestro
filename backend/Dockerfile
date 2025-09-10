@@ -1,29 +1,5 @@
-# Multi-stage build for production optimization
-FROM node:20-alpine AS builder
-
-# Install security updates
-RUN apk update && apk upgrade
-
-# Set working directory
-WORKDIR /app
-
-# Copy workspace package files for better Docker layer caching
-COPY package*.json ./
-COPY backend/package*.json ./backend/
-
-# Install all dependencies from workspace root
-# Set CI=true to skip interactive husky install
-ENV CI=true
-RUN npm ci --include=dev --workspaces
-
-# Copy backend source code
-COPY backend/ ./backend/
-
-# Skip all build steps for faster Docker builds
-# (linting and testing handled by CI)
-
-# Production stage
-FROM node:20-alpine AS production
+# Single-stage build for simplicity
+FROM node:20-alpine
 
 # Install security updates and required packages
 RUN apk update && apk upgrade && \
@@ -47,8 +23,8 @@ ENV HUSKY=0
 RUN npm ci --omit=dev --workspaces && \
     npm cache clean --force
 
-# Copy backend application files from builder
-COPY --from=builder --chown=sudoq:nodejs /app/backend .
+# Copy backend application files
+COPY backend/ .
 
 # Remove development files and create necessary directories
 RUN rm -rf tests/ coverage/ .nyc_output/ && \
