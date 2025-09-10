@@ -1,12 +1,13 @@
 name: CI/CD Pipeline
 
-# Add permissions for CodeQL and security scanning
+# Add permissions for CodeQL, security scanning, and container registry
 permissions:
   actions: read
   contents: read
   security-events: write
   statuses: write
   checks: write
+  packages: write
 
 on:
   push:
