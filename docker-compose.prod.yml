@@ -1,80 +1,207 @@
-services:
-  mongo:
-    image: mongo:6.0
-    restart: unless-stopped
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USERNAME}
-      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
-      MONGO_INITDB_DATABASE: sudoqmaestro
-    volumes:
-      - mongo-data:/data/db
-      - ./mongo-init:/docker-entrypoint-initdb.d
-    networks:
-      - sudoq-network
-    command: --auth --quiet
+version: '3.8'
 
-  backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
+# Production Docker Compose configuration for SudoQMaestro
+# Includes all services with production optimizations, monitoring, and security
+
+services:
+  # MongoDB Database with authentication and replica set
+  mongodb:
+    image: mongo:7.0
+    container_name: sudoq-mongodb
     restart: unless-stopped
     environment:
-      - NODE_ENV=production
-      - MONGODB_URI=mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@mongo:27017/sudoqmaestro?authSource=admin
-      - SESSION_SECRET=${SESSION_SECRET}
-      - JWT_SECRET=${JWT_SECRET}
-      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
-      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
-    ports:
-      - "5000:5000"
-    depends_on:
-      - mongo
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD}
+      MONGO_INITDB_DATABASE: ${MONGO_DB_NAME}
+    volumes:
+      - mongodb_data:/data/db
+      - mongodb_config:/data/configdb
+      - ./mongodb-init.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
     networks:
       - sudoq-network
-    volumes:
-      - backend-logs:/app/logs
+    ports:
+      - "127.0.0.1:27017:27017"  # Only bind to localhost
+    command: ["mongod", "--auth", "--bind_ip_all"]
     healthcheck:
-      test: ["CMD", "node", "-e", "require('http').get('http://localhost:5000/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"]
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 40s
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 1G
+        reservations:
+          cpus: '1.0'
+          memory: 512M
 
+  # Backend API with comprehensive environment setup
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: production
+    container_name: sudoq-backend
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: 5000
+      MONGODB_URI: mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@mongodb:27017/${MONGO_DB_NAME}?authSource=${MONGO_DB_NAME}
+      JWT_SECRET: ${JWT_SECRET}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+      SESSION_SECRET: ${SESSION_SECRET}
+      FRONTEND_URL: ${FRONTEND_URL}
+      ADMIN_KEY: ${ADMIN_KEY}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      REDIS_URL: redis://redis:6379
+    volumes:
+      - backend_logs:/app/logs
+      - backend_uploads:/app/uploads
+      - backend_temp:/app/temp
+    networks:
+      - sudoq-network
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:5000/health', (res) => process.exit(res.statusCode === 200 ? 0 : 1))"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    deploy:
+      resources:
+        limits:
+          cpus: '1.5'
+          memory: 1G
+        reservations:
+          cpus: '0.5'
+          memory: 256M
+
+  # Frontend with nginx serving static files
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+      target: production
+    container_name: sudoq-frontend
     restart: unless-stopped
-    ports:
-      - "80:80"
-    depends_on:
-      - backend
+    environment:
+      TZ: UTC
+      NGINX_PORT: 8080
     networks:
       - sudoq-network
+    depends_on:
+      backend:
+        condition: service_healthy
     healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:80"]
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/health"]
       interval: 30s
       timeout: 10s
       retries: 3
+      start_period: 30s
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+        reservations:
+          cpus: '0.1'
+          memory: 64M
 
-  # Optional: Redis for session storage in production
+  # Redis for session storage and caching
   redis:
     image: redis:7-alpine
+    container_name: sudoq-redis
     restart: unless-stopped
     networks:
       - sudoq-network
+    ports:
+      - "127.0.0.1:6379:6379"
     volumes:
-      - redis-data:/data
-    command: redis-server --appendonly yes
+      - redis_data:/data
+      - ./redis/redis.conf:/usr/local/etc/redis/redis.conf:ro
+    command: redis-server /usr/local/etc/redis/redis.conf
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 128M
 
+  # Reverse Proxy & Load Balancer
+  nginx:
+    image: nginx:1.25-alpine
+    container_name: sudoq-nginx
+    restart: unless-stopped
+    ports:
+      - "${HTTP_PORT:-80}:80"
+      - "${HTTPS_PORT:-443}:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - nginx_logs:/var/log/nginx
+      - ssl_certs:/etc/nginx/ssl:ro
+    networks:
+      - sudoq-network
+    depends_on:
+      frontend:
+        condition: service_healthy
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "nginx", "-t"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 128M
+
+# Named volumes for data persistence
 volumes:
-  mongo-data:
+  mongodb_data:
+    name: sudoq-mongodb-data
     driver: local
-  backend-logs:
+  mongodb_config:
+    name: sudoq-mongodb-config
     driver: local
-  redis-data:
+  backend_logs:
+    name: sudoq-backend-logs
+    driver: local
+  backend_uploads:
+    name: sudoq-backend-uploads
+    driver: local
+  backend_temp:
+    name: sudoq-backend-temp
+    driver: local
+  redis_data:
+    name: sudoq-redis-data
+    driver: local
+  nginx_logs:
+    name: sudoq-nginx-logs
+    driver: local
+  ssl_certs:
+    name: sudoq-ssl-certs
     driver: local
 
+# Custom network for service communication
 networks:
   sudoq-network:
+    name: sudoq-network
     driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.20.0.0/16
