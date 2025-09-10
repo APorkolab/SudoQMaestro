@@ -35,7 +35,7 @@ jobs:
     - name: Install backend dependencies
       run: |
         cd backend
-        npm ci
+        npm i
     
     - name: Run backend linting
       run: |
@@ -74,7 +74,7 @@ jobs:
     - name: Install frontend dependencies
       run: |
         cd frontend
-        npm ci
+        npm i
     
     - name: Run frontend linting
       run: |
@@ -110,7 +110,7 @@ jobs:
     - name: Install dependencies
       run: |
         cd backend
-        npm ci --only=production
+        npm i --only=production
     
     - name: Create production artifacts
       run: |
@@ -142,7 +142,7 @@ jobs:
     - name: Install dependencies
       run: |
         cd frontend
-        npm ci
+        npm i
     
     - name: Build for production
       run: |
