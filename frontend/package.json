@@ -18,7 +18,7 @@
     "format:check": "prettier --check \"src/**/*.{ts,html,scss}\"",
     "analyze": "ng build --configuration production && npx webpack-bundle-analyzer dist/frontend/browser/stats.json",
     "serve:ssr:frontend": "node dist/frontend/server/server.mjs",
-    "prepare": "is-ci || husky install",
+    "prepare": "node -e \"process.exit(process.env.CI ? 0 : 1)\" || husky install",
     "test:single": "ng test --include=**/*.spec.ts --watch=false --browsers=ChromeHeadless --code-coverage"
   },
   "prettier": {
@@ -69,7 +69,6 @@
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-import": "^2.30.0",
     "husky": "^9.1.6",
-    "is-ci": "^4.1.0",
     "jasmine-core": "~5.9.0",
     "karma": "~6.4.0",
     "karma-chrome-launcher": "~3.2.0",

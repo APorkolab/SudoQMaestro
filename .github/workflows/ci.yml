@@ -53,7 +53,7 @@ jobs:
     - name: Run backend tests
       run: |
         cd backend
-        npm test
+        npm run test:coverage
       env:
         NODE_ENV: test
         MONGODB_URI: mongodb://localhost:27017/sudoqmaestro_test
@@ -64,6 +64,8 @@ jobs:
       with:
         files: ./backend/coverage/lcov.info
         flags: backend
+        fail_ci_if_error: false
+      continue-on-error: true
 
   frontend-tests:
     name: Frontend Tests
@@ -99,6 +101,8 @@ jobs:
       with:
         files: ./frontend/coverage/lcov.info
         flags: frontend
+        fail_ci_if_error: false
+      continue-on-error: true
 
   build-backend:
     name: Build Backend
