@@ -1,6 +1,7 @@
 import { describe, it, expect, jest, beforeEach } from '@jest/globals';
 import request from 'supertest';
 import express from 'express';
+
 import puzzleRoutesFactory from './puzzle.routes.js';
 
 // Helper function to create a test app instance

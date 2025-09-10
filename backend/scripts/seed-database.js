@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 import mongoose from 'mongoose';
+
 import User from '../models/user.model.js';
 import Puzzle from '../models/puzzle.model.js';
 import { generateSudoku } from '../services/sudoku.service.js';
@@ -86,7 +87,7 @@ async function seedPuzzles(users) {
             user: user._id,
             puzzleGrid: puzzle,
             solutionGrid: solution,
-            difficulty: difficulty
+            difficulty
           });
           
           const savedPuzzle = await puzzleDoc.save();

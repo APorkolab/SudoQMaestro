@@ -2,13 +2,14 @@
  * Error handling middleware
  */
 
-import config from '../../config/env.js';
 import multer from 'multer';
+
+import config from '../../config/env.js';
 
 /**
  * Handle 404 errors - catch-all for routes that don't exist
  */
-export const notFoundHandler = (req, res, next) => {
+export const notFoundHandler = (req, res, _next) => {
   const error = new Error(`Route ${req.originalUrl} not found`);
   error.statusCode = 404;
   next(error);

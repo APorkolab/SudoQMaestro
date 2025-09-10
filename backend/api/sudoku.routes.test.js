@@ -1,8 +1,9 @@
 import { describe, it, expect, beforeAll, afterAll, jest } from '@jest/globals';
 import request from 'supertest';
 import express from 'express';
-import sudokuRoutes from './sudoku.routes.js'; // The router we want to test
 import mongoose from 'mongoose';
+
+import sudokuRoutes from './sudoku.routes.js'; // The router we want to test
 
 // We need to create a minimal app to test the router in isolation
 const app = express();

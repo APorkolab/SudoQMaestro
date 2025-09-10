@@ -1,6 +1,8 @@
 import express from 'express';
-import { isAdmin } from './middleware/admin.middleware.js';
+
 import { adminLimiter, modificationLimiter } from '../config/security.js';
+
+import { isAdmin } from './middleware/admin.middleware.js';
 
 // This is now a factory function that accepts User and Puzzle models as dependencies.
 // This makes the router more testable as we can inject mock models.

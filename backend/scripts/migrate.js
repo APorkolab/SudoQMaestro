@@ -1,9 +1,11 @@
 #!/usr/bin/env node
 
-import mongoose from 'mongoose';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+
+import mongoose from 'mongoose';
+
 import config from '../config/env.js';
 
 const __filename = fileURLToPath(import.meta.url);

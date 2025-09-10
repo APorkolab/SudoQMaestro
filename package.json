@@ -1,0 +1,66 @@
+{
+  "name": "sudoqmaestro",
+  "version": "1.0.0",
+  "description": "AI-Powered Sudoku Solver - Full-stack application with Angular frontend and Express backend",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:frontend": "cd frontend && npm run serve",
+    "build": "concurrently \"npm run build:backend\" \"npm run build:frontend\"",
+    "build:backend": "cd backend && npm run build",
+    "build:frontend": "cd frontend && npm run build",
+    "start": "cd backend && npm start",
+    "test": "concurrently \"npm run test:backend\" \"npm run test:frontend\"",
+    "test:backend": "cd backend && npm test",
+    "test:frontend": "cd frontend && npm test",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:headed": "playwright test --headed",
+    "test:e2e:chromium": "playwright test --project=chromium",
+    "test:e2e:firefox": "playwright test --project=firefox",
+    "test:e2e:webkit": "playwright test --project=webkit",
+    "test:e2e:mobile": "playwright test --project='Mobile Chrome'",
+    "test:e2e:debug": "playwright test --debug",
+    "test:e2e:report": "playwright show-report e2e-results/html",
+    "lint": "concurrently \"npm run lint:backend\" \"npm run lint:frontend\"",
+    "lint:backend": "cd backend && npm run lint",
+    "lint:frontend": "cd frontend && npm run lint",
+    "install:all": "npm install && cd backend && npm install && cd ../frontend && npm install",
+    "clean": "rimraf node_modules backend/node_modules frontend/node_modules e2e-results",
+    "docker:build": "./scripts/docker-dev.sh build",
+    "docker:up": "./scripts/docker-dev.sh start",
+    "docker:down": "./scripts/docker-dev.sh stop",
+    "setup": "./scripts/dev-setup.sh"
+  },
+  "keywords": [
+    "sudoku",
+    "solver",
+    "angular",
+    "express",
+    "typescript",
+    "mongodb",
+    "ai",
+    "ocr",
+    "image-processing"
+  ],
+  "author": "SudoQMaestro Team",
+  "license": "MIT",
+  "devDependencies": {
+    "@playwright/test": "^1.49.1",
+    "concurrently": "^9.2.1",
+    "rimraf": "^6.0.1"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/APorkolab/SudoQMaestro.git"
+  },
+  "workspaces": [
+    "backend",
+    "frontend"
+  ]
+}

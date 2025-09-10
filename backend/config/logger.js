@@ -1,4 +1,5 @@
 import winston from 'winston';
+
 import config from './env.js';
 
 const { combine, timestamp, errors, printf, colorize, json } = winston.format;

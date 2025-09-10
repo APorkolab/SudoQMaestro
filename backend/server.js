@@ -3,6 +3,7 @@ import cors from 'cors';
 import session from 'express-session';
 import passport from 'passport';
 import morgan from 'morgan';
+import mongoose from 'mongoose';
 
 // Config imports
 import config from './config/env.js';
@@ -23,7 +24,6 @@ import { errorHandler, notFoundHandler } from './api/middleware/error.middleware
 // Model imports
 import User from './models/user.model.js';
 import Puzzle from './models/puzzle.model.js';
-import mongoose from 'mongoose';
 
 const app = express();
 

@@ -106,8 +106,8 @@ export const generateSudoku = (difficulty = 'medium') => {
     let count = removalCount[difficulty] || 50;
 
     while (count > 0 && attempts > 0) {
-        let row = Math.floor(Math.random() * 9);
-        let col = Math.floor(Math.random() * 9);
+        const row = Math.floor(Math.random() * 9);
+        const col = Math.floor(Math.random() * 9);
 
         if (puzzle[row][col] !== 0) {
             puzzle[row][col] = 0;

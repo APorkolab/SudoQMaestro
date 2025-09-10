@@ -1,6 +1,8 @@
 import express from 'express';
-import { isAuth } from './middleware/auth.middleware.js';
+
 import { modificationLimiter, generalLimiter } from '../config/security.js';
+
+import { isAuth } from './middleware/auth.middleware.js';
 
 // Factory function for puzzle routes
 export default (Puzzle) => {

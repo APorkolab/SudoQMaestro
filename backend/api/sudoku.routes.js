@@ -1,10 +1,9 @@
 import express from 'express';
 import multer from 'multer';
+
 import { solveSudoku, generateSudoku } from '../services/sudoku.service.js';
 import { processAndSolveImage } from '../services/image.service.js';
 import Puzzle from '../models/puzzle.model.js';
-import { isAuth } from './middleware/auth.middleware.js';
-import { validateJoi, validateFile, validateCustom } from './middleware/validation.middleware.js';
 import { solveLimiter, generateLimiter, uploadLimiter, modificationLimiter } from '../config/security.js';
 import {
   solvePuzzleSchema,
@@ -13,6 +12,9 @@ import {
   validateSudokuRules,
   imageUploadSchema
 } from '../validators/sudoku.validators.js';
+
+import { isAuth } from './middleware/auth.middleware.js';
+import { validateJoi, validateFile, validateCustom } from './middleware/validation.middleware.js';
 
 const router = express.Router();
 
@@ -82,7 +84,7 @@ const router = express.Router();
 
 // Multer setup for image uploads (in-memory storage)
 const storage = multer.memoryStorage();
-const upload = multer({ storage: storage });
+const upload = multer({ storage });
 
 /**
  * @swagger

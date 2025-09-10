@@ -1,4 +1,5 @@
-import mongoose from 'mongoose';
+// import mongoose from 'mongoose'; // Will be used when tests are implemented
+
 import User from './user.model.js';
 
 describe('User Model', () => {

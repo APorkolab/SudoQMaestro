@@ -1,5 +1,6 @@
 import * as Jimp from 'jimp';
 import Tesseract from 'tesseract.js';
+
 import { solveSudoku } from './sudoku.service.js';
 
 /**

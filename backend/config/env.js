@@ -1,5 +1,6 @@
+// import path from 'path'; // Currently unused
+
 import dotenv from 'dotenv';
-import path from 'path';
 
 // Load environment variables
 const result = dotenv.config();
