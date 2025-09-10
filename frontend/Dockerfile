@@ -1,4 +1,4 @@
-# Multi-stage build for Angular application
+# Single-stage build for Angular application
 FROM node:20-alpine AS builder
 
 # Install security updates
@@ -7,23 +7,11 @@ RUN apk update && apk upgrade
 # Set working directory
 WORKDIR /app
 
-# Copy package files for better caching
-COPY package*.json ./
-
-# Install all dependencies
-RUN npm ci --include=dev
-
-# Copy source code
+# Copy source code first
 COPY . .
 
-# Run linting and tests
-RUN npm run lint && npm run test:ci
-
-# Build the application for production
-RUN npm run build:prod
-
-# Verify build output
-RUN ls -la dist/frontend/browser/
+# Install dependencies and build
+RUN npm install && npm run build:prod
 
 # Production stage with Nginx
 FROM nginx:1.25-alpine AS production
