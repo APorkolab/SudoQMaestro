@@ -48,6 +48,13 @@ const options = {
         }
       },
       schemas: {
+        ServerError: {
+          type: 'object',
+          properties: {
+            success: { type: 'boolean', example: false },
+            error: { type: 'string', example: 'Internal Server Error' }
+          }
+        },
         User: {
           type: 'object',
           properties: {
@@ -170,6 +177,18 @@ const options = {
               type: 'string',
               description: 'Success message',
               example: 'Operation completed successfully'
+            }
+          }
+        }
+      },
+      responses: {
+        ServerError: {
+          description: 'Internal Server Error',
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/ServerError'
+              }
             }
           }
         }

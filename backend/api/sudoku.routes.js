@@ -7,13 +7,108 @@ import { isAuth } from './middleware/auth.middleware.js';
 
 const router = express.Router();
 
+/**
+ * @swagger
+ * tags:
+ *   name: Sudoku
+ *   description: Sudoku puzzle solving, generation, and image processing
+ */
+
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     SudokuGrid:
+ *       type: array
+ *       items:
+ *         type: array
+ *         items:
+ *           type: integer
+ *           minimum: 0
+ *           maximum: 9
+ *       description: '9x9 Sudoku grid where 0 represents empty cells'
+ *       example: [[5,3,0,0,7,0,0,0,0],[6,0,0,1,9,5,0,0,0],[0,9,8,0,0,0,0,6,0],[8,0,0,0,6,0,0,0,3],[4,0,0,8,0,3,0,0,1],[7,0,0,0,2,0,0,0,6],[0,6,0,0,0,0,2,8,0],[0,0,0,4,1,9,0,0,5],[0,0,0,0,8,0,0,7,9]]
+ *     SudokuSolution:
+ *       type: array
+ *       items:
+ *         type: array
+ *         items:
+ *           type: integer
+ *           minimum: 1
+ *           maximum: 9
+ *       description: '9x9 Sudoku solution grid with all cells filled'
+ *       example: [[5,3,4,6,7,8,9,1,2],[6,7,2,1,9,5,3,4,8],[1,9,8,3,4,2,5,6,7],[8,5,9,7,6,1,4,2,3],[4,2,6,8,5,3,7,9,1],[7,1,3,9,2,4,8,5,6],[9,6,1,5,3,7,2,8,4],[2,8,7,4,1,9,6,3,5],[3,4,5,2,8,6,1,7,9]]
+ *     GeneratePuzzleRequest:
+ *       type: object
+ *       properties:
+ *         difficulty:
+ *           type: string
+ *           enum: [easy, medium, hard, expert]
+ *           description: 'Difficulty level for puzzle generation'
+ *           example: 'medium'
+ *     GeneratePuzzleResponse:
+ *       type: object
+ *       properties:
+ *         puzzle:
+ *           $ref: '#/components/schemas/SudokuGrid'
+ *         solution:
+ *           $ref: '#/components/schemas/SudokuSolution'
+ *         difficulty:
+ *           type: string
+ *           enum: [easy, medium, hard, expert]
+ *           example: 'medium'
+ *     SolvePuzzleRequest:
+ *       type: object
+ *       required:
+ *         - grid
+ *       properties:
+ *         grid:
+ *           $ref: '#/components/schemas/SudokuGrid'
+ *     SolvePuzzleResponse:
+ *       type: object
+ *       properties:
+ *         solution:
+ *           $ref: '#/components/schemas/SudokuSolution'
+ */
+
 // Multer setup for image uploads (in-memory storage)
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
-// @route   POST /api/sudoku/solve
-// @desc    Solves a Sudoku puzzle
-// @access  Public
+/**
+ * @swagger
+ * /api/sudoku/solve:
+ *   post:
+ *     summary: Solve a Sudoku puzzle
+ *     description: Solves a provided Sudoku puzzle using backtracking algorithm
+ *     tags: [Sudoku]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/SolvePuzzleRequest'
+ *     responses:
+ *       200:
+ *         description: Puzzle solved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/SolvePuzzleResponse'
+ *       400:
+ *         description: Invalid puzzle grid or no solution exists
+ *         content:
+ *           application/json:
+ *             schema:
+ *               allOf:
+ *                 - $ref: '#/components/schemas/Error'
+ *                 - type: object
+ *                   properties:
+ *                     error:
+ *                       example: 'No solution exists for the given puzzle'
+ *       500:
+ *         $ref: '#/components/responses/ServerError'
+ */
 router.post('/solve', (req, res) => {
   const { grid } = req.body;
 
@@ -30,9 +125,47 @@ router.post('/solve', (req, res) => {
   }
 });
 
-// @route   POST /api/sudoku/solve-from-image
-// @desc    Solves a Sudoku puzzle from an uploaded image
-// @access  Public
+/**
+ * @swagger
+ * /api/sudoku/solve-from-image:
+ *   post:
+ *     summary: Solve Sudoku from image
+ *     description: Upload an image of a Sudoku puzzle and get the solution using OCR and AI processing
+ *     tags: [Sudoku]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               sudokuImage:
+ *                 type: string
+ *                 format: binary
+ *                 description: Image file containing a Sudoku puzzle (jpg, png, etc.)
+ *             required:
+ *               - sudokuImage
+ *     responses:
+ *       200:
+ *         description: Puzzle solved from image successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/SolvePuzzleResponse'
+ *       400:
+ *         description: No image uploaded or could not solve puzzle from image
+ *         content:
+ *           application/json:
+ *             schema:
+ *               allOf:
+ *                 - $ref: '#/components/schemas/Error'
+ *                 - type: object
+ *                   properties:
+ *                     error:
+ *                       example: 'Could not solve puzzle from image'
+ *       500:
+ *         $ref: '#/components/responses/ServerError'
+ */
 router.post('/solve-from-image', upload.single('sudokuImage'), async (req, res) => {
     if (!req.file) {
         return res.status(400).json({ msg: 'No image file uploaded.' });
@@ -52,18 +185,83 @@ router.post('/solve-from-image', upload.single('sudokuImage'), async (req, res) 
     }
 });
 
-// @route   GET /api/sudoku/generate
-// @desc    Generates a new Sudoku puzzle
-// @access  Public
+/**
+ * @swagger
+ * /api/sudoku/generate:
+ *   get:
+ *     summary: Generate a new Sudoku puzzle
+ *     description: Creates a new Sudoku puzzle with specified difficulty level
+ *     tags: [Sudoku]
+ *     parameters:
+ *       - in: query
+ *         name: difficulty
+ *         schema:
+ *           type: string
+ *           enum: [easy, medium, hard, expert]
+ *           default: medium
+ *         description: Difficulty level for the generated puzzle
+ *     responses:
+ *       200:
+ *         description: New puzzle generated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/GeneratePuzzleResponse'
+ *       500:
+ *         $ref: '#/components/responses/ServerError'
+ */
 router.get('/generate', (req, res) => {
   const { difficulty } = req.query;
   const result = generateSudoku(difficulty);
   res.json(result);
 });
 
-// @route   POST /api/sudoku/save
-// @desc    Saves a Sudoku puzzle and its solution
-// @access  Private
+/**
+ * @swagger
+ * /api/sudoku/save:
+ *   post:
+ *     summary: Save a Sudoku puzzle
+ *     description: Save a Sudoku puzzle and its solution to the database (requires authentication)
+ *     tags: [Sudoku]
+ *     security:
+ *       - sessionAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - puzzle
+ *               - solution
+ *             properties:
+ *               puzzle:
+ *                 $ref: '#/components/schemas/SudokuGrid'
+ *               solution:
+ *                 $ref: '#/components/schemas/SudokuSolution'
+ *     responses:
+ *       201:
+ *         description: Puzzle saved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Puzzle'
+ *       400:
+ *         description: Puzzle and solution are required
+ *         content:
+ *           application/json:
+ *             schema:
+ *               allOf:
+ *                 - $ref: '#/components/schemas/Error'
+ *                 - type: object
+ *                   properties:
+ *                     error:
+ *                       example: 'Puzzle and solution are required'
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ *       500:
+ *         $ref: '#/components/responses/ServerError'
+ */
 router.post('/save', isAuth, async (req, res) => {
     try {
         const { puzzle, solution } = req.body;
@@ -85,9 +283,43 @@ router.post('/save', isAuth, async (req, res) => {
     }
 });
 
-// @route   GET /api/sudoku/:id
-// @desc    Gets a saved puzzle by ID
-// @access  Public
+/**
+ * @swagger
+ * /api/sudoku/{id}:
+ *   get:
+ *     summary: Get a saved puzzle by ID
+ *     description: Retrieves a specific Sudoku puzzle from the database by its ID
+ *     tags: [Sudoku]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           pattern: '^[0-9a-fA-F]{24}$'
+ *         description: MongoDB ObjectId of the puzzle
+ *         example: '507f1f77bcf86cd799439012'
+ *     responses:
+ *       200:
+ *         description: Puzzle retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Puzzle'
+ *       404:
+ *         description: Puzzle not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               allOf:
+ *                 - $ref: '#/components/schemas/Error'
+ *                 - type: object
+ *                   properties:
+ *                     error:
+ *                       example: 'Puzzle not found'
+ *       500:
+ *         $ref: '#/components/responses/ServerError'
+ */
 router.get('/:id', async (req, res) => {
     try {
         const puzzle = await Puzzle.findById(req.params.id);

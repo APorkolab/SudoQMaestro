@@ -1,0 +1,14 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 📖 Documentation
+    url: https://github.com/yourusername/SudoQMaestro#readme
+    about: Check our comprehensive README for setup and usage instructions
+  - name: 💬 Discussions
+    url: https://github.com/yourusername/SudoQMaestro/discussions
+    about: Ask questions and discuss ideas with the community
+  - name: 🔒 Security Issues
+    url: https://github.com/yourusername/SudoQMaestro/security/advisories
+    about: Report security vulnerabilities privately
+  - name: 📧 Contact Maintainers
+    url: mailto:support@sudoqmaestro.com
+    about: For questions that don't fit into any category above
