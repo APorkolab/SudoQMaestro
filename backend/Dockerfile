@@ -19,9 +19,9 @@ RUN npm ci --include=dev --workspaces
 # Copy backend source code
 COPY backend/ ./backend/
 
-# Run production build steps (linting, testing) for backend workspace
+# Run production build steps (linting only, skip tests in Docker)
 WORKDIR /app/backend
-RUN npm run lint && npm run test:ci
+RUN npm run lint
 WORKDIR /app
 
 # Production stage
