@@ -7,17 +7,20 @@ RUN apk update && apk upgrade
 # Set working directory
 WORKDIR /app
 
-# Copy package files for better Docker layer caching
+# Copy workspace package files for better Docker layer caching
 COPY package*.json ./
+COPY backend/package*.json ./backend/
 
-# Install all dependencies (including dev) for building
-RUN npm ci --include=dev
+# Install all dependencies from workspace root
+RUN npm ci --include=dev --workspaces
 
-# Copy source code
-COPY . .
+# Copy backend source code
+COPY backend/ ./backend/
 
-# Run production build steps (linting, testing)
+# Run production build steps (linting, testing) for backend workspace
+WORKDIR /app/backend
 RUN npm run lint && npm run test:ci
+WORKDIR /app
 
 # Production stage
 FROM node:20-alpine AS production
@@ -34,15 +37,16 @@ RUN addgroup -g 1001 -S nodejs && \
 # Set working directory
 WORKDIR /app
 
-# Copy package files
+# Copy workspace package files
 COPY package*.json ./
+COPY backend/package*.json ./backend/
 
-# Install only production dependencies
-RUN npm ci --only=production && \
+# Install only production dependencies for workspace
+RUN npm ci --omit=dev --workspaces && \
     npm cache clean --force
 
-# Copy application files from builder
-COPY --from=builder --chown=sudoq:nodejs /app .
+# Copy backend application files from builder
+COPY --from=builder --chown=sudoq:nodejs /app/backend .
 
 # Remove development files and create necessary directories
 RUN rm -rf tests/ coverage/ .nyc_output/ && \
