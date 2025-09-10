@@ -26,7 +26,7 @@ RUN npm run build:prod
 RUN ls -la dist/frontend/browser/
 
 # Production stage with Nginx
-FROM nginx:1.25-alpine AS production
+FROM nginx:1.29-alpine AS production
 
 # Install security updates
 RUN apk update && apk upgrade && \
