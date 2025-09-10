@@ -31,7 +31,7 @@ jobs:
           --health-retries 5
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
     
     - name: Setup Node.js
       uses: actions/setup-node@v4
@@ -72,7 +72,7 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
     
     - name: Setup Node.js
       uses: actions/setup-node@v4
@@ -110,7 +110,7 @@ jobs:
     needs: backend-tests
     
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
     
     - name: Setup Node.js
       uses: actions/setup-node@v4
@@ -142,7 +142,7 @@ jobs:
     needs: frontend-tests
     
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
     
     - name: Setup Node.js
       uses: actions/setup-node@v4
@@ -175,7 +175,7 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
     
     - name: Setup Node.js
       uses: actions/setup-node@v4
@@ -214,7 +214,7 @@ jobs:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
     
     - name: Set lowercase repository owner
       run: echo "REPO_OWNER_LOWERCASE=${GITHUB_REPOSITORY_OWNER,,}" >> $GITHUB_ENV
