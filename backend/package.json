@@ -15,7 +15,7 @@
     "lint:check": "eslint . --ext .js",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "prepare": "node -e \"process.exit(process.env.CI ? 0 : 1)\" || husky install",
+    "prepare": "node -e \"process.exit(process.env.CI || process.env.HUSKY === '0' || process.env.NODE_ENV === 'production' ? 0 : 1)\" || husky install",
     "seed": "node scripts/seed-database.js",
     "migrate:up": "node scripts/migrate.js up",
     "migrate:down": "node scripts/migrate.js down",
