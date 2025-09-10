@@ -1,5 +1,5 @@
 # Multi-stage build for production optimization
-FROM node:20-alpine AS builder
+FROM node:24-alpine AS builder
 
 # Install security updates
 RUN apk update && apk upgrade
@@ -23,7 +23,7 @@ COPY backend/ ./backend/
 # (linting and testing handled by CI)
 
 # Production stage
-FROM node:20-alpine AS production
+FROM node:24-alpine AS production
 
 # Install security updates and required packages
 RUN apk update && apk upgrade && \
