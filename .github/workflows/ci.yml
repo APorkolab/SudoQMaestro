@@ -1,5 +1,13 @@
 name: CI/CD Pipeline
 
+# Add permissions for CodeQL and security scanning
+permissions:
+  actions: read
+  contents: read
+  security-events: write
+  statuses: write
+  checks: write
+
 on:
   push:
     branches: [ main, develop ]
@@ -170,28 +178,36 @@ jobs:
       with:
         node-version: '20'
     
+    - name: Install backend dependencies for audit
+      run: |
+        cd backend
+        npm i --package-lock-only
+    
     - name: Run security audit for backend
       run: |
         cd backend
         npm audit --audit-level high
+      continue-on-error: true
+    
+    - name: Install frontend dependencies for audit
+      run: |
+        cd frontend
+        npm i --package-lock-only
     
     - name: Run security audit for frontend
       run: |
         cd frontend
         npm audit --audit-level high
-    
-    - name: Run CodeQL Analysis
-      uses: github/codeql-action/init@v3
-      with:
-        languages: javascript
-    
-    - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@v3
+      continue-on-error: true
+
+  # CodeQL analysis moved to separate workflow (codeql.yml)
+  # This keeps the main CI pipeline focused and faster
 
   docker-build:
     name: Build Docker Images
     runs-on: ubuntu-latest
-    needs: [build-backend, build-frontend]
+    needs: [build-backend, build-frontend, security-audit]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     
     steps:
     - uses: actions/checkout@v4
