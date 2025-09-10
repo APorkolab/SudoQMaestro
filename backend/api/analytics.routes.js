@@ -1,7 +1,15 @@
 import express from 'express';
+
 import performanceMonitor from '../middleware/performance-monitor.js';
 
 const router = express.Router();
+
+// Helper function for conditional logging
+const logError = (message, error) => {
+  if (process.env.NODE_ENV !== 'production') {
+    logError(message, error);
+  }
+};
 
 // Middleware to check admin access (simplified for now)
 const requireAdmin = (req, res, next) => {
@@ -48,7 +56,7 @@ router.post('/performance', (req, res) => {
 
     res.json({ success: true, processed: metrics.length });
   } catch (error) {
-    console.error('Error processing performance metrics:', error);
+    logError('Error processing performance metrics:', error);
     res.status(500).json({ error: 'Failed to process metrics' });
   }
 });
@@ -64,7 +72,9 @@ router.get('/metrics/summary', requireAdmin, (req, res) => {
     
     res.json(summary);
   } catch (error) {
-    console.error('Error getting metrics summary:', error);
+    if (process.env.NODE_ENV !== 'production') {
+      logError('Error getting metrics summary:', error);
+    }
     res.status(500).json({ error: 'Failed to retrieve metrics summary' });
   }
 });
@@ -78,7 +88,9 @@ router.get('/metrics/raw', requireAdmin, (req, res) => {
     const rawMetrics = performanceMonitor.getRawMetrics();
     res.json(rawMetrics);
   } catch (error) {
-    console.error('Error getting raw metrics:', error);
+    if (process.env.NODE_ENV !== 'production') {
+      logError('Error getting raw metrics:', error);
+    }
     res.status(500).json({ error: 'Failed to retrieve raw metrics' });
   }
 });
@@ -97,7 +109,9 @@ router.get('/health', (req, res) => {
     
     res.status(statusCode).json(health);
   } catch (error) {
-    console.error('Error getting health status:', error);
+    if (process.env.NODE_ENV !== 'production') {
+      logError('Error getting health status:', error);
+    }
     res.status(500).json({ 
       status: 'error',
       message: 'Failed to retrieve health status',
@@ -152,7 +166,7 @@ router.get('/metrics/requests', requireAdmin, (req, res) => {
       timestamp: new Date().toISOString()
     });
   } catch (error) {
-    console.error('Error getting request metrics:', error);
+    logError('Error getting request metrics:', error);
     res.status(500).json({ error: 'Failed to retrieve request metrics' });
   }
 });
@@ -206,7 +220,7 @@ router.get('/metrics/errors', requireAdmin, (req, res) => {
       timestamp: new Date().toISOString()
     });
   } catch (error) {
-    console.error('Error getting error metrics:', error);
+    logError('Error getting error metrics:', error);
     res.status(500).json({ error: 'Failed to retrieve error metrics' });
   }
 });
@@ -258,7 +272,7 @@ router.get('/metrics/database', requireAdmin, (req, res) => {
       timestamp: new Date().toISOString()
     });
   } catch (error) {
-    console.error('Error getting database metrics:', error);
+    logError('Error getting database metrics:', error);
     res.status(500).json({ error: 'Failed to retrieve database metrics' });
   }
 });
@@ -289,7 +303,7 @@ router.get('/metrics/system', requireAdmin, (req, res) => {
 
     res.json(currentMetrics);
   } catch (error) {
-    console.error('Error getting system metrics:', error);
+    logError('Error getting system metrics:', error);
     res.status(500).json({ error: 'Failed to retrieve system metrics' });
   }
 });
@@ -309,7 +323,7 @@ router.post('/config', requireAdmin, (req, res) => {
       config 
     });
   } catch (error) {
-    console.error('Error updating config:', error);
+    logError('Error updating config:', error);
     res.status(500).json({ error: 'Failed to update configuration' });
   }
 });
@@ -337,7 +351,7 @@ router.post('/clear', requireAdmin, (req, res) => {
       message: `Cleared ${type || 'all'} metrics` 
     });
   } catch (error) {
-    console.error('Error clearing metrics:', error);
+    logError('Error clearing metrics:', error);
     res.status(500).json({ error: 'Failed to clear metrics' });
   }
 });
@@ -399,19 +413,19 @@ router.get('/dashboard', requireAdmin, (req, res) => {
         hourlyStats,
         timeRange
       },
-      alerts: this.generateAlerts(summary, health),
+      alerts: generateAlerts(summary, health),
       timestamp: new Date().toISOString()
     };
     
     res.json(dashboard);
   } catch (error) {
-    console.error('Error getting dashboard data:', error);
+    logError('Error getting dashboard data:', error);
     res.status(500).json({ error: 'Failed to retrieve dashboard data' });
   }
 });
 
 // Helper function to generate alerts based on metrics
-function generateAlerts(summary, health) {
+function generateAlerts(summary, _health) {
   const alerts = [];
   
   // High error rate

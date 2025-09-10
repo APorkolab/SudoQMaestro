@@ -122,9 +122,9 @@ export class PerformanceMonitorService {
     // Cumulative Layout Shift (CLS)
     let clsScore = 0;
     this.observePerformanceEntry('layout-shift', (entries) => {
-      entries.forEach((entry: any) => {
+      entries.forEach((entry: PerformanceEntry & { hadRecentInput?: boolean; value?: number }) => {
         if (!entry.hadRecentInput) {
-          clsScore += entry.value;
+          clsScore += (entry.value || 0);
         }
       });
       this.metrics.cls = clsScore;
@@ -257,7 +257,7 @@ export class PerformanceMonitorService {
     });
   }
 
-  public trackUserInteraction(action: string, element?: string, value?: any): void {
+  public trackUserInteraction(action: string, element?: string, value?: unknown): void {
     this.trackCustomMetric('user-interaction', {
       action,
       element,
@@ -267,10 +267,15 @@ export class PerformanceMonitorService {
     });
   }
 
-  public trackError(error: any, context?: string): void {
+  public trackError(error: Error | string | unknown, context?: string): void {
+    const errorMessage = error instanceof Error ? error.message : 
+                        typeof error === 'string' ? error : 
+                        'Unknown error';
+    const errorStack = error instanceof Error ? error.stack : undefined;
+    
     this.trackCustomMetric('error', {
-      message: error.message || error,
-      stack: error.stack,
+      message: errorMessage,
+      stack: errorStack,
       context,
       timestamp: Date.now(),
       url: window.location.pathname,
@@ -290,7 +295,7 @@ export class PerformanceMonitorService {
     });
   }
 
-  private trackCustomMetric(name: string, data: any): void {
+  private trackCustomMetric(name: string, data: Record<string, unknown>): void {
     if (this.config.enableUserTiming) {
       performance.mark(`custom-${name}-${Date.now()}`);
     }
@@ -302,7 +307,7 @@ export class PerformanceMonitorService {
     });
   }
 
-  private queueMetrics(metrics: any): void {
+  private queueMetrics(metrics: Record<string, unknown>): void {
     // Sample rate control
     if (Math.random() > this.config.sampleRate) {
       return;
@@ -327,7 +332,7 @@ export class PerformanceMonitorService {
     this.sendMetrics(metricsToSend);
   }
 
-  private async sendMetrics(metrics: any[]): Promise<void> {
+  private async sendMetrics(metrics: Record<string, unknown>[]): Promise<void> {
     try {
       // Use sendBeacon for reliability during page unload
       if (navigator.sendBeacon && typeof document !== 'undefined') {

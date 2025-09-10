@@ -159,7 +159,11 @@ class PerformanceMonitor {
       try {
         obs.observe({ entryTypes: ['gc'] });
       } catch (error) {
-        console.warn('GC performance observation not available:', error.message);
+        // GC performance observation not available - this is normal in some environments
+        if (process.env.NODE_ENV === 'development') {
+          // eslint-disable-next-line no-console
+          console.warn('GC performance observation not available:', error.message);
+        }
       }
     }
   }
@@ -185,7 +189,7 @@ class PerformanceMonitor {
       timestamp: new Date().toISOString(),
       cpu: {
         count: cpus.length,
-        loadAverage: loadAverage,
+        loadAverage,
         usage: cpuUsage
       },
       memory: {
@@ -199,7 +203,7 @@ class PerformanceMonitor {
         platform: os.platform(),
         arch: os.arch(),
         uptime: os.uptime(),
-        processUptime: processUptime
+        processUptime
       }
     };
 
