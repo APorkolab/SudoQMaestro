@@ -220,23 +220,28 @@ SudoQMaestro/
 
 #### Backend
 ```bash
-npm start          # Start production server
-npm run dev        # Start development server with hot reload
-npm test           # Run test suite
-npm run test:watch # Run tests in watch mode
-npm run test:coverage # Generate coverage report
-npm run lint       # Run ESLint
-npm run format     # Format code with Prettier
+npm start            # Start production server
+npm run dev          # Start development server with hot reload
+npm test             # Run test suite
+npm run test:watch   # Run tests in watch mode
+npm run test:coverage# Generate coverage report
+npm run lint         # Run ESLint
+npm run format       # Format code with Prettier
+npm run seed         # Seed the database with development data
+npm run migrate:up    # Apply pending database migrations
+npm run migrate:down  # Rollback last migration
+npm run migrate:status # Check migration status
 ```
 
 #### Frontend
 ```bash
-ng serve           # Start development server
-ng build           # Build for development
-ng build:prod      # Build for production
-ng test            # Run unit tests
-ng test:ci         # Run tests in CI mode
-ng lint            # Run linting
+ng serve             # Start development server
+ng build             # Build for development
+ng build:prod        # Build for production
+ng test              # Run unit tests
+ng test:ci           # Run tests in CI mode
+npm run test:single  # Run a single test file via --include
+ng lint              # Run linting
 ```
 
 ### Testing

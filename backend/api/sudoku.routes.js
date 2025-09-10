@@ -4,6 +4,15 @@ import { solveSudoku, generateSudoku } from '../services/sudoku.service.js';
 import { processAndSolveImage } from '../services/image.service.js';
 import Puzzle from '../models/puzzle.model.js';
 import { isAuth } from './middleware/auth.middleware.js';
+import { validateJoi, validateFile, validateCustom } from './middleware/validation.middleware.js';
+import { solveLimiter, generateLimiter, uploadLimiter, modificationLimiter } from '../config/security.js';
+import {
+  solvePuzzleSchema,
+  generatePuzzleSchema,
+  savePuzzleSchema,
+  validateSudokuRules,
+  imageUploadSchema
+} from '../validators/sudoku.validators.js';
 
 const router = express.Router();
 
@@ -109,12 +118,13 @@ const upload = multer({ storage: storage });
  *       500:
  *         $ref: '#/components/responses/ServerError'
  */
-router.post('/solve', (req, res) => {
+router.post('/solve', 
+  solveLimiter,
+  validateJoi(solvePuzzleSchema),
+  validateCustom(validateSudokuRules, 'body'),
+  (req, res) => {
   const { grid } = req.body;
-
-  if (!grid || !Array.isArray(grid)) {
-    return res.status(400).json({ msg: 'Invalid puzzle grid provided.' });
-  }
+  // Validation middleware already handled grid validation
 
   const solution = solveSudoku(grid);
 
@@ -166,10 +176,12 @@ router.post('/solve', (req, res) => {
  *       500:
  *         $ref: '#/components/responses/ServerError'
  */
-router.post('/solve-from-image', upload.single('sudokuImage'), async (req, res) => {
-    if (!req.file) {
-        return res.status(400).json({ msg: 'No image file uploaded.' });
-    }
+router.post('/solve-from-image', 
+  uploadLimiter,
+  upload.single('sudokuImage'),
+  validateFile(imageUploadSchema),
+  async (req, res) => {
+    // File validation middleware already handled file validation
 
     try {
         const solution = await processAndSolveImage(req.file);
@@ -210,7 +222,10 @@ router.post('/solve-from-image', upload.single('sudokuImage'), async (req, res) 
  *       500:
  *         $ref: '#/components/responses/ServerError'
  */
-router.get('/generate', (req, res) => {
+router.get('/generate', 
+  generateLimiter,
+  validateJoi(generatePuzzleSchema, 'query'),
+  (req, res) => {
   const { difficulty } = req.query;
   const result = generateSudoku(difficulty);
   res.json(result);
@@ -262,7 +277,13 @@ router.get('/generate', (req, res) => {
  *       500:
  *         $ref: '#/components/responses/ServerError'
  */
-router.post('/save', isAuth, async (req, res) => {
+router.post('/save', 
+  modificationLimiter,
+  isAuth, 
+  validateJoi(savePuzzleSchema),
+  validateCustom(validateSudokuRules, 'body.puzzle'),
+  validateCustom(validateSudokuRules, 'body.solution'),
+  async (req, res) => {
     try {
         const { puzzle, solution } = req.body;
         if (!puzzle || !solution) {

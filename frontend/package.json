@@ -17,7 +17,8 @@
     "format:check": "prettier --check \"src/**/*.{ts,html,scss}\"",
     "analyze": "ng build --configuration production && npx webpack-bundle-analyzer dist/frontend/browser/stats.json",
     "serve:ssr:frontend": "node dist/frontend/server/server.mjs",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "test:single": "ng test --include=**/*.spec.ts --watch=false --browsers=ChromeHeadless --code-coverage"
   },
   "prettier": {
     "printWidth": 100,
@@ -53,7 +54,9 @@
     "@angular/build": "^20.2.0",
     "@angular/cli": "^20.2.0",
     "@angular/compiler-cli": "^20.2.0",
-    "@angular/eslint": "^18.3.1",
+    "@angular-eslint/builder": "^18.3.1",
+    "@angular-eslint/eslint-plugin": "^18.3.1",
+    "@angular-eslint/schematics": "^18.3.1",
     "@types/express": "^5.0.1",
     "@types/jasmine": "~5.1.0",
     "@types/node": "^20.17.19",

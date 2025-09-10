@@ -1,5 +1,6 @@
 import express from 'express';
 import passport from 'passport';
+import { authLimiter, generalLimiter } from '../config/security.js';
 
 const router = express.Router();
 
@@ -60,9 +61,11 @@ const router = express.Router();
  *         $ref: '#/components/responses/ServerError'
  *         description: Internal server error during OAuth initiation
  */
-router.get('/google', passport.authenticate('google', {
-  scope: ['profile', 'email']
-}));
+router.get('/google', 
+  authLimiter,
+  passport.authenticate('google', {
+    scope: ['profile', 'email']
+  }));
 
 /**
  * @swagger
@@ -99,7 +102,10 @@ router.get('/google', passport.authenticate('google', {
  *               type: string
  *               example: /login-failed
  */
-router.get('/google/callback', passport.authenticate('google', { failureRedirect: '/login-failed' }), (req, res) => {
+router.get('/google/callback', 
+  authLimiter,
+  passport.authenticate('google', { failureRedirect: '/login-failed' }), 
+  (req, res) => {
   // Successful authentication, redirect to a success page on the frontend.
   // In a real app, you might redirect to a dashboard or profile page.
   res.redirect('/?login=success');
@@ -125,7 +131,9 @@ router.get('/google/callback', passport.authenticate('google', { failureRedirect
  *       500:
  *         $ref: '#/components/responses/ServerError'
  */
-router.get('/logout', (req, res, next) => {
+router.get('/logout', 
+  generalLimiter,
+  (req, res, next) => {
   req.logout((err) => {
     if (err) { return next(err); }
     // Successful logout, redirect to homepage.
@@ -153,7 +161,9 @@ router.get('/logout', (req, res, next) => {
  *         $ref: '#/components/responses/Unauthorized'
  *         description: User not authenticated
  */
-router.get('/current-user', (req, res) => {
+router.get('/current-user', 
+  generalLimiter,
+  (req, res) => {
   if (req.user) {
     res.send(req.user);
   } else {

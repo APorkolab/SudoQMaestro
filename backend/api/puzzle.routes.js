@@ -1,5 +1,6 @@
 import express from 'express';
 import { isAuth } from './middleware/auth.middleware.js';
+import { modificationLimiter, generalLimiter } from '../config/security.js';
 
 // Factory function for puzzle routes
 export default (Puzzle) => {
@@ -8,7 +9,7 @@ export default (Puzzle) => {
   // @route   POST /api/puzzles
   // @desc    Save a new puzzle for the logged-in user
   // @access  Private
-  router.post('/', isAuth, async (req, res) => {
+  router.post('/', modificationLimiter, isAuth, async (req, res) => {
     try {
       const { puzzleGrid, solutionGrid, difficulty } = req.body;
 
@@ -35,7 +36,7 @@ export default (Puzzle) => {
   // @route   GET /api/puzzles
   // @desc    Get all saved puzzles for the logged-in user
   // @access  Private
-  router.get('/', isAuth, async (req, res) => {
+  router.get('/', generalLimiter, isAuth, async (req, res) => {
     try {
       const puzzles = await Puzzle.find({ user: req.user.id }).sort({ createdAt: -1 });
       res.json(puzzles);

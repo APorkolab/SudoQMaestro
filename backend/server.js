@@ -18,6 +18,7 @@ import authRoutes from './api/auth.routes.js';
 import adminRoutesFactory from './api/admin.routes.js';
 import puzzleRoutesFactory from './api/puzzle.routes.js';
 import healthRoutes from './api/health.routes.js';
+import { errorHandler, notFoundHandler } from './api/middleware/error.middleware.js';
 
 // Model imports
 import User from './models/user.model.js';
@@ -102,31 +103,9 @@ app.get('/', (req, res) => {
   });
 });
 
-// Error handling middleware
-app.use((err, req, res, next) => {
-  logger.error('Unhandled error:', {
-    error: err.message,
-    stack: err.stack,
-    url: req.url,
-    method: req.method,
-    ip: req.ip,
-  });
-  
-  res.status(err.status || 500).json({
-    success: false,
-    error: config.isProduction ? 'Internal Server Error' : err.message,
-    ...(config.isDevelopment && { stack: err.stack }),
-  });
-});
-
-// 404 handler
-app.use((req, res) => {
-  res.status(404).json({
-    success: false,
-    error: 'Endpoint not found',
-    path: req.url,
-  });
-});
+// Error handling middleware (must be last)
+app.use(notFoundHandler);
+app.use(errorHandler);
 
 // Graceful shutdown
 const gracefulShutdown = (signal) => {

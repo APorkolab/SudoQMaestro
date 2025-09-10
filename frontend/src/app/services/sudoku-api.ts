@@ -8,6 +8,7 @@ export type SudokuGrid = (number | null)[][];
 export interface SudokuGenerationResult {
   puzzle: SudokuGrid;
   solution: SudokuGrid;
+  difficulty?: 'easy' | 'medium' | 'hard' | 'custom';
 }
 
 @Injectable({

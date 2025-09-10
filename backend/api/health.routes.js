@@ -1,5 +1,6 @@
 import express from 'express';
 import mongoose from 'mongoose';
+import { healthLimiter } from '../config/security.js';
 
 const router = express.Router();
 
@@ -7,7 +8,7 @@ const router = express.Router();
  * Health check endpoint
  * Returns application status and dependencies
  */
-router.get('/health', async (req, res) => {
+router.get('/health', healthLimiter, async (req, res) => {
   const healthCheck = {
     uptime: process.uptime(),
     timestamp: Date.now(),
@@ -55,7 +56,7 @@ router.get('/health', async (req, res) => {
  * Readiness check endpoint
  * Returns 200 when app is ready to serve traffic
  */
-router.get('/ready', async (req, res) => {
+router.get('/ready', healthLimiter, async (req, res) => {
   try {
     // Check if database is connected
     if (mongoose.connection.readyState !== 1) {
@@ -82,7 +83,7 @@ router.get('/ready', async (req, res) => {
  * Liveness check endpoint
  * Returns 200 if the app is alive (basic health)
  */
-router.get('/live', (req, res) => {
+router.get('/live', healthLimiter, (req, res) => {
   res.status(200).json({
     status: 'ALIVE',
     timestamp: Date.now(),

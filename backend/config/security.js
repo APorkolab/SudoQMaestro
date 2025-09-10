@@ -67,6 +67,72 @@ export const authLimiter = rateLimit({
   legacyHeaders: false,
 });
 
+// Sudoku solving rate limiter (computational intensive)
+export const solveLimiter = rateLimit({
+  windowMs: 5 * 60 * 1000, // 5 minutes
+  max: 20, // Limit solve requests to 20 per 5 minutes
+  message: {
+    error: 'Too many solve requests from this IP, please try again later.',
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+// Puzzle generation rate limiter
+export const generateLimiter = rateLimit({
+  windowMs: 5 * 60 * 1000, // 5 minutes
+  max: 50, // Limit generation to 50 per 5 minutes
+  message: {
+    error: 'Too many puzzle generation requests from this IP, please try again later.',
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+// Admin operations rate limiter (stricter)
+export const adminLimiter = rateLimit({
+  windowMs: 10 * 60 * 1000, // 10 minutes
+  max: 30, // Limit admin operations to 30 per 10 minutes
+  message: {
+    error: 'Too many admin requests from this IP, please try again later.',
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+// Data modification rate limiter (save, delete)
+export const modificationLimiter = rateLimit({
+  windowMs: 10 * 60 * 1000, // 10 minutes
+  max: 100, // Limit data modifications to 100 per 10 minutes
+  message: {
+    error: 'Too many modification requests from this IP, please try again later.',
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+// Health check rate limiter (more lenient)
+export const healthLimiter = rateLimit({
+  windowMs: 1 * 60 * 1000, // 1 minute
+  max: 10, // Limit health checks to 10 per minute
+  message: {
+    error: 'Too many health check requests from this IP.',
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+// General purpose rate limiter for standard API requests
+export const generalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 200, // Limit general requests to 200 per 15 minutes
+  message: {
+    error: 'Too many requests from this IP, please try again later.',
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
 // Input validation schemas
 export const validationSchemas = {
   // Add your Joi schemas here as needed
