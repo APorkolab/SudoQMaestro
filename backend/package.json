@@ -35,6 +35,7 @@
     "express": "^5.1.0",
     "express-rate-limit": "^7.4.0",
     "express-session": "^1.18.0",
+    "express-validator": "^7.2.1",
     "helmet": "^7.1.0",
     "jimp": "^1.6.0",
     "joi": "^17.13.3",
@@ -65,18 +66,12 @@
     "supertest": "^7.1.4"
   },
   "jest": {
-    "preset": "@babel/preset-env",
     "testEnvironment": "node",
-    "extensionsToTreatAsEsm": [".js"],
     "setupFilesAfterEnv": [
       "<rootDir>/jest.setup.js"
     ],
-    "transform": {
-      "^.+\\.js$": ["babel-jest", { "useESM": true }]
-    },
-    "globals": {
-      "jest": true
-    },
+    "transform": {},
+    "injectGlobals": true,
     "testTimeout": 30000,
     "testMatch": [
       "**/?(*.)+(spec|test).js"

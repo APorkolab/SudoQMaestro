@@ -31,15 +31,7 @@ afterEach(async () => {
   }
 });
 
-// Global test timeout is now set in package.json jest config
+// Global test timeout is set in package.json jest config
 
-// Mock console.log in tests to keep output clean
-// Note: jest functions will be available in test context
-if (typeof global !== 'undefined' && global.jest) {
-  global.console = {
-    ...console,
-    log: global.jest.fn(),
-    warn: global.jest.fn(),
-    error: global.jest.fn(),
-  };
-}
+// Make jest global available in ES modules
+global.jest = jest;
