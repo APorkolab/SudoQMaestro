@@ -1,4 +1,4 @@
-import { TestBed } from '@angular/core/testing';
+import { TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { NotificationService } from './notification.service';
 
 describe('NotificationService', () => {
@@ -53,7 +53,7 @@ describe('NotificationService', () => {
     expect(service.message()).toBeNull();
   });
 
-  it('should auto-clear message after timeout', (done) => {
+  it('should auto-clear message after timeout', fakeAsync(() => {
     // Override the duration for faster testing
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (service as any).duration = 100;
@@ -61,27 +61,22 @@ describe('NotificationService', () => {
     service.show('Test message');
     expect(service.message()).toBe('Test message');
     
-    setTimeout(() => {
-      expect(service.message()).toBeNull();
-      done();
-    }, 150);
-  });
+    tick(150);
+    expect(service.message()).toBeNull();
+  }));
 
-  it('should cancel previous timeout when showing new message', (done) => {
+  it('should cancel previous timeout when showing new message', fakeAsync(() => {
     // Override the duration for faster testing
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (service as any).duration = 100;
     
     service.show('First message');
     
-    setTimeout(() => {
-      service.show('Second message');
-      expect(service.message()).toBe('Second message');
-      
-      setTimeout(() => {
-        expect(service.message()).toBeNull();
-        done();
-      }, 150);
-    }, 50);
-  });
+    tick(50);
+    service.show('Second message');
+    expect(service.message()).toBe('Second message');
+    
+    tick(150);
+    expect(service.message()).toBeNull();
+  }));
 });

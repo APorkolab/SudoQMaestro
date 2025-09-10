@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { Router } from '@angular/router';
 import { MyPuzzlesComponent, SavedPuzzle } from './my-puzzles';
 import { SudokuApiService } from '../../services/sudoku-api';
 import { AuthService } from '../../services/auth.service';
@@ -7,6 +8,7 @@ import { AuthService } from '../../services/auth.service';
 describe('MyPuzzlesComponent', () => {
   let component: MyPuzzlesComponent;
   let fixture: ComponentFixture<MyPuzzlesComponent>;
+  let router: jasmine.SpyObj<Router>;
   // Note: These spies are created in beforeEach but may not be used in all tests
 
   const mockPuzzle: SavedPuzzle = {
@@ -20,17 +22,20 @@ describe('MyPuzzlesComponent', () => {
   beforeEach(async () => {
     const sudokuServiceSpy = jasmine.createSpyObj('SudokuApiService', ['generateSudoku']);
     const authServiceSpy = jasmine.createSpyObj('AuthService', ['currentUser']);
+    const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
 
     await TestBed.configureTestingModule({
       imports: [MyPuzzlesComponent, HttpClientTestingModule],
       providers: [
         { provide: SudokuApiService, useValue: sudokuServiceSpy },
-        { provide: AuthService, useValue: authServiceSpy }
+        { provide: AuthService, useValue: authServiceSpy },
+        { provide: Router, useValue: routerSpy }
       ]
     }).compileComponents();
 
     fixture = TestBed.createComponent(MyPuzzlesComponent);
     component = fixture.componentInstance;
+    router = TestBed.inject(Router) as jasmine.SpyObj<Router>;
     // Note: Services are mocked and injected in beforeEach
   });
 
@@ -74,11 +79,9 @@ describe('MyPuzzlesComponent', () => {
   });
 
   it('should navigate to main page', () => {
-    spyOn(component, 'goToMainPage').and.callThrough();
-    
     component.goToMainPage();
     
-    expect(component.goToMainPage).toHaveBeenCalled();
+    expect(router.navigate).toHaveBeenCalledWith(['/']);
   });
 
   it('should log puzzle loading', () => {

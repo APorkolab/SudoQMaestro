@@ -1,8 +1,9 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { SudokuGridComponent } from '../sudoku-grid/sudoku-grid';
+import { Router } from '@angular/router';
 import { SudokuApiService, SudokuGrid } from '../../services/sudoku-api';
 import { AuthService } from '../../services/auth.service';
+import { SudokuGridComponent } from '../sudoku-grid/sudoku-grid';
 
 export interface SavedPuzzle {
   _id: string;
@@ -112,6 +113,7 @@ export interface SavedPuzzle {
 export class MyPuzzlesComponent implements OnInit {
   private sudokuService = inject(SudokuApiService);
   private authService = inject(AuthService);
+  private router = inject(Router);
   
   puzzles: SavedPuzzle[] = [];
   isLoading = false;
@@ -129,10 +131,11 @@ export class MyPuzzlesComponent implements OnInit {
     // In a real implementation, you would call an API endpoint like:
     // this.sudokuService.getMyPuzzles().subscribe({...})
     
-    setTimeout(() => {
+    // Use Promise.resolve to simulate async operation without setTimeout
+    Promise.resolve().then(() => {
       this.puzzles = [];
       this.isLoading = false;
-    }, 1000);
+    });
   }
 
   loadPuzzle(puzzle: SavedPuzzle): void {
@@ -141,14 +144,14 @@ export class MyPuzzlesComponent implements OnInit {
   }
 
   deletePuzzle(puzzleId: string): void {
-    if (confirm('Are you sure you want to delete this puzzle?')) {
+    if (typeof window !== 'undefined' && confirm('Are you sure you want to delete this puzzle?')) {
       // API call to delete puzzle
       this.puzzles = this.puzzles.filter(p => p._id !== puzzleId);
     }
   }
 
   goToMainPage(): void {
-    // Navigate to main page
-    window.location.href = '/';
+    // Navigate to main page using Angular router
+    this.router.navigate(['/']);
   }
 }
