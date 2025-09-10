@@ -10,7 +10,8 @@ import { SudokuApiService, SudokuGrid } from '../../services/sudoku-api';
   styleUrl: './image-uploader.scss'
 })
 export class ImageUploaderComponent {
-  @Output() onSolveSuccess = new EventEmitter<SudokuGrid>();
+  @Output() solveSuccess = new EventEmitter<SudokuGrid>();
+  @Output() uploadError = new EventEmitter<string>();
 
   private sudokuService = inject(SudokuApiService);
 
@@ -21,7 +22,7 @@ export class ImageUploaderComponent {
 
   onFileSelected(event: Event): void {
     const element = event.currentTarget as HTMLInputElement;
-    let fileList: FileList | null = element.files;
+    const fileList: FileList | null = element.files;
     if (fileList && fileList.length > 0) {
       this.selectedFile = fileList[0];
       this.error = null;
@@ -45,12 +46,14 @@ export class ImageUploaderComponent {
     this.sudokuService.solveFromImage(this.selectedFile).subscribe({
       next: (result) => {
         this.isLoading = false;
-        this.onSolveSuccess.emit(result.solution);
+        this.solveSuccess.emit(result.solution);
       },
       error: (err) => {
         this.isLoading = false;
-        this.error = err.error?.msg || 'Failed to solve puzzle from image.';
-        console.error(err);
+        const errorMessage = err.error?.msg || err.message || 'Failed to solve puzzle from image.';
+        this.error = errorMessage;
+        this.uploadError.emit(errorMessage);
+        console.error('Image solve error:', err);
       }
     });
   }

@@ -1,41 +1,22 @@
-import { Component, OnInit, inject, signal, WritableSignal } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { SudokuGridComponent } from './components/sudoku-grid/sudoku-grid';
-import { ImageUploaderComponent } from './components/image-uploader/image-uploader';
-import { SudokuApiService, SudokuGenerationResult, SudokuGrid } from './services/sudoku-api';
+import { RouterOutlet, RouterLink } from '@angular/router';
+import { NotificationComponent } from './components/notification/notification';
+import { ErrorBoundaryComponent } from './components/error-boundary/error-boundary';
+import { AuthService } from './services/auth.service';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, SudokuGridComponent, ImageUploaderComponent],
+  imports: [CommonModule, RouterOutlet, RouterLink, NotificationComponent, ErrorBoundaryComponent],
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })
-export class App implements OnInit {
-  private sudokuService = inject(SudokuApiService);
-
-  // State managed with Signals
-  puzzleState: WritableSignal<SudokuGenerationResult | null> = signal(null);
-
-  ngOnInit(): void {
-    this.loadNewPuzzle();
-  }
-
-  loadNewPuzzle(difficulty: 'easy' | 'medium' | 'hard' = 'medium'): void {
-    this.puzzleState.set(null); // Set to null to show loading indicator
-    this.sudokuService.generateSudoku(difficulty).subscribe({
-      next: (data) => this.puzzleState.set(data),
-      error: (err) => console.error('Failed to generate puzzle', err)
-    });
-  }
-
-  onPuzzleSolvedFromImage(solutionGrid: SudokuGrid): void {
-    // When an image is solved, we only have the solution.
-    // We can display the solution directly, or create a new puzzle state.
-    // Here, we'll display the solution as the "puzzle" and also as the solution.
-    this.puzzleState.set({
-      puzzle: solutionGrid,
-      solution: solutionGrid
-    });
-  }
+export class AppComponent {
+  authService = inject(AuthService);
+  
+  // Environment detection for error boundary
+  isProduction = !window.location.hostname.includes('localhost') && 
+                 !window.location.hostname.includes('127.0.0.1') &&
+                 !window.location.hostname.includes('dev');
 }

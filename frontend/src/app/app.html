@@ -14,6 +14,14 @@
     </div>
   </header>
 
-  <router-outlet></router-outlet>
+  <app-error-boundary
+    title="Page Error"
+    message="Something went wrong loading this page. Please try again."
+    [showDetails]="!isProduction"
+  >
+    <router-outlet></router-outlet>
+  </app-error-boundary>
 
+  <!-- Global notification component -->
+  <app-notification></app-notification>
 </main>

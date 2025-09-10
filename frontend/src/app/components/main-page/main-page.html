@@ -1,14 +1,77 @@
-<div class="controls">
-  <button (click)="loadNewPuzzle('easy')">New Easy Game</button>
-  <button (click)="loadNewPuzzle('medium')">New Medium Game</button>
-  <button (click)="loadNewPuzzle('hard')">New Hard Game</button>
-</div>
+<app-error-boundary 
+  title="Puzzle Loading Error"
+  message="Failed to load the Sudoku puzzle. Please try generating a new one."
+>
+  <div class="controls">
+    <button 
+      (click)="loadNewPuzzle('easy')"
+      [disabled]="isLoading()"
+    >
+      @if (isLoading()) {
+        Loading...
+      } @else {
+        New Easy Game
+      }
+    </button>
+    <button 
+      (click)="loadNewPuzzle('medium')"
+      [disabled]="isLoading()"
+    >
+      @if (isLoading()) {
+        Loading...
+      } @else {
+        New Medium Game
+      }
+    </button>
+    <button 
+      (click)="loadNewPuzzle('hard')"
+      [disabled]="isLoading()"
+    >
+      @if (isLoading()) {
+        Loading...
+      } @else {
+        New Hard Game
+      }
+    </button>
+  </div>
 
-<app-image-uploader (onSolveSuccess)="onPuzzleSolvedFromImage($event)"></app-image-uploader>
+  @if (error()) {
+    <div class="error-message" role="alert">
+      <span class="error-icon">⚠️</span>
+      <span>{{ error() }}</span>
+      <button 
+        class="error-retry" 
+        (click)="loadNewPuzzle()"
+        [disabled]="isLoading()"
+      >
+        Retry
+      </button>
+    </div>
+  }
 
-<div class="grid-container">
-  <app-sudoku-grid [grid]="puzzleState()?.puzzle ?? null" [readonly]="true"></app-sudoku-grid>
-</div>
+  <app-image-uploader 
+    (solveSuccess)="onPuzzleSolvedFromImage($event)"
+    (uploadError)="onImageSolveError($event)"
+  ></app-image-uploader>
+
+  <div class="grid-container">
+    @if (isLoading() && !puzzleState()) {
+      <div class="loading-state">
+        <div class="loading-spinner"></div>
+        <p>Generating puzzle...</p>
+      </div>
+    } @else if (puzzleState()?.puzzle) {
+      <app-sudoku-grid 
+        [grid]="puzzleState()!.puzzle" 
+        [readonly]="true"
+      ></app-sudoku-grid>
+    } @else if (!error()) {
+      <div class="empty-state">
+        <p>No puzzle loaded. Click a button above to generate a new puzzle!</p>
+      </div>
+    }
+  </div>
+</app-error-boundary>
 
 <footer>
   <p>Built with Angular & Express</p>
