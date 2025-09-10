@@ -216,6 +216,9 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     
+    - name: Set lowercase repository owner
+      run: echo "REPO_OWNER_LOWERCASE=${GITHUB_REPOSITORY_OWNER,,}" >> $GITHUB_ENV
+    
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
     
@@ -234,8 +237,8 @@ jobs:
         file: ./backend/Dockerfile
         push: ${{ github.event_name != 'pull_request' }}
         tags: |
-          ghcr.io/${{ github.repository_owner }}/sudoqmaestro/backend:latest
-          ghcr.io/${{ github.repository_owner }}/sudoqmaestro/backend:${{ github.sha }}
+          ghcr.io/${{ env.REPO_OWNER_LOWERCASE }}/sudoqmaestro/backend:latest
+          ghcr.io/${{ env.REPO_OWNER_LOWERCASE }}/sudoqmaestro/backend:${{ github.sha }}
         cache-from: type=gha
         cache-to: type=gha,mode=max
     
@@ -246,7 +249,7 @@ jobs:
         file: ./frontend/Dockerfile
         push: ${{ github.event_name != 'pull_request' }}
         tags: |
-          ghcr.io/${{ github.repository_owner }}/sudoqmaestro/frontend:latest
-          ghcr.io/${{ github.repository_owner }}/sudoqmaestro/frontend:${{ github.sha }}
+          ghcr.io/${{ env.REPO_OWNER_LOWERCASE }}/sudoqmaestro/frontend:latest
+          ghcr.io/${{ env.REPO_OWNER_LOWERCASE }}/sudoqmaestro/frontend:${{ github.sha }}
         cache-from: type=gha
         cache-to: type=gha,mode=max
