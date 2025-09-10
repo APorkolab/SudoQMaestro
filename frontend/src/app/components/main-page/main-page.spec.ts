@@ -85,7 +85,7 @@ describe('MainPageComponent', () => {
     const expectedResult = {
       puzzle: solutionGrid,
       solution: solutionGrid,
-      difficulty: 'custom' as any
+      difficulty: 'custom' as const
     };
     expect(component.puzzleState()).toEqual(expectedResult);
   });

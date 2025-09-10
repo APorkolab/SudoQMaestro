@@ -65,13 +65,19 @@
     "supertest": "^7.1.4"
   },
   "jest": {
+    "preset": "@babel/preset-env",
     "testEnvironment": "node",
+    "extensionsToTreatAsEsm": [".js"],
     "setupFilesAfterEnv": [
       "<rootDir>/jest.setup.js"
     ],
     "transform": {
-      "^.+\\.js$": "babel-jest"
+      "^.+\\.js$": ["babel-jest", { "useESM": true }]
     },
+    "globals": {
+      "jest": true
+    },
+    "testTimeout": 30000,
     "testMatch": [
       "**/?(*.)+(spec|test).js"
     ],

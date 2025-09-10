@@ -17,6 +17,7 @@ export default (User, Puzzle) => {
       const users = await User.find({});
       res.json(users);
     } catch (err) {
+      // eslint-disable-next-line no-console
       console.error(err.message);
       res.status(500).send('Server Error');
     }
@@ -35,6 +36,7 @@ export default (User, Puzzle) => {
 
       res.json({ msg: 'User deleted successfully' });
     } catch (err) {
+      // eslint-disable-next-line no-console
       console.error(err.message);
       // Check for invalid ObjectId format, which Mongoose throws as a CastError
       if (err.kind === 'ObjectId') {
@@ -73,6 +75,7 @@ export default (User, Puzzle) => {
 
       res.json(updatedUser);
     } catch (err) {
+      // eslint-disable-next-line no-console
       console.error(err.message);
       // Check for invalid ObjectId format
       if (err.kind === 'ObjectId') {
@@ -90,6 +93,7 @@ export default (User, Puzzle) => {
       const puzzles = await Puzzle.find({}).populate('user', 'displayName email').sort({ createdAt: -1 });
       res.json(puzzles);
     } catch (err) {
+      // eslint-disable-next-line no-console
       console.error(err.message);
       res.status(500).send('Server Error');
     }
@@ -108,6 +112,7 @@ export default (User, Puzzle) => {
 
       res.json({ msg: 'Puzzle deleted successfully' });
     } catch (err) {
+      // eslint-disable-next-line no-console
       console.error(err.message);
       if (err.kind === 'ObjectId') {
         return res.status(404).json({ msg: 'Puzzle not found' });

@@ -194,6 +194,7 @@ router.post('/solve-from-image',
             res.status(400).json({ msg: 'Could not solve puzzle from image.' });
         }
     } catch (error) {
+        // eslint-disable-next-line no-console
         console.error(error);
         res.status(500).send('Server Error');
     }
@@ -301,6 +302,7 @@ router.post('/save',
         res.status(201).json(savedPuzzle);
 
     } catch (error) {
+        // eslint-disable-next-line no-console
         console.error(error);
         res.status(500).send('Server Error');
     }
@@ -351,6 +353,7 @@ router.get('/:id', async (req, res) => {
         }
         res.json(puzzle);
     } catch (error) {
+        // eslint-disable-next-line no-console
         console.error(error);
         if (error.kind === 'ObjectId') {
             return res.status(404).json({ msg: 'Puzzle not found.' });

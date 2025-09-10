@@ -33,6 +33,7 @@ export const processAndSolveImage = async (file) => {
     const cellHeight = image.bitmap.height / 9;
 
     const worker = await Tesseract.createWorker('eng', 1, {
+      // eslint-disable-next-line no-console
       logger: m => console.log(m) // Log OCR progress
     });
     await worker.setParameters({
@@ -62,12 +63,14 @@ export const processAndSolveImage = async (file) => {
 
     await worker.terminate();
 
+    // eslint-disable-next-line no-console
     console.log('Recognized Grid:', puzzleGrid);
 
     // 4. Solve the puzzle
     return solveSudoku(puzzleGrid);
 
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error('Error processing image:', error);
     return null;
   }

@@ -39,15 +39,26 @@ export class AuthService {
   /**
    * Initiates Google OAuth login
    */
+  login(): void {
+    this.loginWithGoogle();
+  }
+  
+  /**
+   * Initiates Google OAuth login
+   */
   loginWithGoogle(): void {
-    window.location.href = `${this.apiUrl}/google`;
+    if (typeof window !== 'undefined') {
+      window.location.href = `${this.apiUrl}/google`;
+    }
   }
 
   /**
    * Logs out the current user
    */
   logout(): void {
-    window.location.href = `${this.apiUrl}/logout`;
+    if (typeof window !== 'undefined') {
+      window.location.href = `${this.apiUrl}/logout`;
+    }
   }
 
   /**

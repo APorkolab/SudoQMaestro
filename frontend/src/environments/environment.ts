@@ -5,5 +5,6 @@ export const environment = {
   enableDebugTools: true,
   enableMocking: false,
   logLevel: 'debug',
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
   version: require('../../package.json').version,
 };

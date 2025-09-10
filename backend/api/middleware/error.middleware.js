@@ -9,7 +9,7 @@ import config from '../../config/env.js';
 /**
  * Handle 404 errors - catch-all for routes that don't exist
  */
-export const notFoundHandler = (req, res, _next) => {
+export const notFoundHandler = (req, res, next) => {
   const error = new Error(`Route ${req.originalUrl} not found`);
   error.statusCode = 404;
   next(error);
@@ -19,7 +19,7 @@ export const notFoundHandler = (req, res, _next) => {
  * Global error handler
  * This should be the last middleware
  */
-export const errorHandler = (error, req, res, next) => {
+export const errorHandler = (error, req, res, _next) => {
   let statusCode = error.statusCode || error.status || 500;
   let message = error.message || 'Internal Server Error';
   
@@ -105,6 +105,7 @@ export const errorHandler = (error, req, res, next) => {
   
   // Log error for debugging (but not in tests)
   if (config.nodeEnv !== 'test') {
+    // eslint-disable-next-line no-console
     console.error('Error:', {
       message: error.message,
       stack: error.stack,

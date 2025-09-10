@@ -6,6 +6,7 @@ import dotenv from 'dotenv';
 const result = dotenv.config();
 
 if (result.error && process.env.NODE_ENV !== 'production') {
+  // eslint-disable-next-line no-console
   console.warn('Warning: .env file not found. Using default values.');
 }
 

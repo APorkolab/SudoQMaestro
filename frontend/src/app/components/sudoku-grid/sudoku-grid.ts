@@ -15,7 +15,10 @@ export class SudokuGridComponent {
   @Input() readonly: boolean = false;
 
   // TrackBy function to optimize grid rendering
-  trackByIndex(index: number, _item: unknown): number {
+  trackByIndex(index: number): number {
     return index;
   }
+  
+  // Alias for template use
+  trackByFn = this.trackByIndex;
 }

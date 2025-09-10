@@ -10,6 +10,7 @@ import config from './config/env.js';
 import connectDB from './config/database.js';
 import logger from './config/logger.js';
 import { helmetConfig, rateLimiter } from './config/security.js';
+// eslint-disable-next-line import/order
 import { swaggerUi, specs } from './config/swagger.js';
 import './config/passport-setup.js'; // This executes the passport config
 
@@ -19,6 +20,7 @@ import authRoutes from './api/auth.routes.js';
 import adminRoutesFactory from './api/admin.routes.js';
 import puzzleRoutesFactory from './api/puzzle.routes.js';
 import healthRoutes from './api/health.routes.js';
+// eslint-disable-next-line import/order
 import { errorHandler, notFoundHandler } from './api/middleware/error.middleware.js';
 
 // Model imports

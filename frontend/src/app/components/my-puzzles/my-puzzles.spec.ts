@@ -7,8 +7,7 @@ import { AuthService } from '../../services/auth.service';
 describe('MyPuzzlesComponent', () => {
   let component: MyPuzzlesComponent;
   let fixture: ComponentFixture<MyPuzzlesComponent>;
-  let sudokuService: jasmine.SpyObj<SudokuApiService>;
-  let authService: jasmine.SpyObj<AuthService>;
+  // Note: These spies are created in beforeEach but may not be used in all tests
 
   const mockPuzzle: SavedPuzzle = {
     _id: '1',

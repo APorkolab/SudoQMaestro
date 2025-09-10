@@ -173,6 +173,11 @@ export class ErrorBoundaryComponent implements OnInit, OnDestroy {
   }
 
   private setupErrorHandlers() {
+    // Check if window is available (not SSR)
+    if (typeof window === 'undefined') {
+      return;
+    }
+    
     // Store original handlers
     this.originalHandler = window.onerror;
     this.originalUnhandledRejection = window.onunhandledrejection;
@@ -193,12 +198,15 @@ export class ErrorBoundaryComponent implements OnInit, OnDestroy {
       
       // Call original handler if it exists
       if (this.originalUnhandledRejection) {
-        return this.originalUnhandledRejection(event);
+        return this.originalUnhandledRejection.call(window, event);
       }
     };
   }
 
   private restoreErrorHandlers() {
+    if (typeof window === 'undefined') {
+      return;
+    }
     window.onerror = this.originalHandler;
     window.onunhandledrejection = this.originalUnhandledRejection;
   }
@@ -209,7 +217,8 @@ export class ErrorBoundaryComponent implements OnInit, OnDestroy {
     this.hasError.set(true);
     
     if (this.showDetails && error) {
-      const errorText = error.stack || error.message || error.toString();
+      const errorObj = error as unknown as { stack?: string; message?: string; toString?: () => string };
+      const errorText = errorObj?.stack || errorObj?.message || (errorObj?.toString ? errorObj.toString() : 'Unknown error');
       this.errorDetails.set(errorText);
     }
   }
@@ -225,7 +234,9 @@ export class ErrorBoundaryComponent implements OnInit, OnDestroy {
   }
 
   reload() {
-    window.location.reload();
+    if (typeof window !== 'undefined') {
+      window.location.reload();
+    }
   }
 
   // Public method to manually trigger error state

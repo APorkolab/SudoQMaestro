@@ -44,7 +44,7 @@ async function getAppliedMigrations() {
     const collection = mongoose.connection.db.collection(MIGRATION_COLLECTION);
     const migrations = await collection.find({}).toArray();
     return migrations.map(m => m.fileName);
-  } catch (error) {
+  } catch {
     console.log('📋 No migration history found, starting fresh');
     return [];
   }

@@ -18,18 +18,19 @@ export class GlobalErrorHandler implements ErrorHandler {
     let userMessage = 'An unexpected error occurred. Please try again.';
     
     // Handle different types of errors
-    if (error?.error?.error) {
+    const errorObj = error as unknown as { error?: { error?: string }; message?: string; name?: string; };
+    if (errorObj?.error?.error) {
       // API error with structured response
-      userMessage = error.error.error;
-    } else if (error?.message) {
+      userMessage = errorObj.error.error;
+    } else if (errorObj?.message) {
       // Standard error with message
-      if (this.isUserFriendlyError(error.message)) {
-        userMessage = error.message;
+      if (this.isUserFriendlyError(errorObj.message)) {
+        userMessage = errorObj.message;
       }
-    } else if (error?.name === 'ChunkLoadError') {
+    } else if (errorObj?.name === 'ChunkLoadError') {
       // Code splitting/lazy loading errors
       userMessage = 'Failed to load application resources. Please refresh the page.';
-    } else if (error?.name === 'TypeError' && error?.message?.includes('fetch')) {
+    } else if (errorObj?.name === 'TypeError' && errorObj?.message?.includes('fetch')) {
       // Network errors
       userMessage = 'Network connection error. Please check your internet connection.';
     }
@@ -41,8 +42,8 @@ export class GlobalErrorHandler implements ErrorHandler {
     if (!this.isProduction()) {
       console.group('🚨 Global Error Details');
       console.error('Original error:', error);
-      console.error('Stack trace:', error?.stack);
-      console.error('Error type:', error?.constructor?.name);
+      console.error('Stack trace:', (error as unknown as { stack?: string })?.stack);
+      console.error('Error type:', (error as unknown as { constructor?: { name?: string } })?.constructor?.name);
       console.groupEnd();
     }
 
@@ -69,6 +70,9 @@ export class GlobalErrorHandler implements ErrorHandler {
   private isProduction(): boolean {
     // Check if running in production mode
     // This can be customized based on your environment detection
+    if (typeof window === 'undefined') {
+      return true; // Assume production for SSR
+    }
     return !window.location.hostname.includes('localhost') && 
            !window.location.hostname.includes('127.0.0.1') &&
            !window.location.hostname.includes('dev');
@@ -78,14 +82,15 @@ export class GlobalErrorHandler implements ErrorHandler {
     // Placeholder for monitoring service integration
     // Examples: Sentry, LogRocket, Bugsnag, etc.
     
+    const errorObj = error as unknown as { message?: string; stack?: string; constructor?: { name?: string } };
     const errorData = {
       message: userMessage,
-      originalError: error?.message || 'Unknown error',
-      stack: error?.stack,
-      url: window.location.href,
-      userAgent: navigator.userAgent,
+      originalError: errorObj?.message || 'Unknown error',
+      stack: errorObj?.stack,
+      url: typeof window !== 'undefined' ? window.location.href : 'SSR',
+      userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : 'SSR',
       timestamp: new Date().toISOString(),
-      errorType: error?.constructor?.name || 'Unknown'
+      errorType: errorObj?.constructor?.name || 'Unknown'
     };
 
     // In a real implementation, you would send this to your monitoring service

@@ -30,6 +30,7 @@ export default (Puzzle) => {
       const puzzle = await newPuzzle.save();
       res.json(puzzle);
     } catch (err) {
+      // eslint-disable-next-line no-console
       console.error(err.message);
       res.status(500).send('Server Error');
     }
@@ -43,6 +44,7 @@ export default (Puzzle) => {
       const puzzles = await Puzzle.find({ user: req.user.id }).sort({ createdAt: -1 });
       res.json(puzzles);
     } catch (err) {
+      // eslint-disable-next-line no-console
       console.error(err.message);
       res.status(500).send('Server Error');
     }

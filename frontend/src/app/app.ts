@@ -16,7 +16,11 @@ export class AppComponent {
   authService = inject(AuthService);
   
   // Environment detection for error boundary
-  isProduction = !window.location.hostname.includes('localhost') && 
+  isProduction = (typeof window !== 'undefined') ? 
+                 !window.location.hostname.includes('localhost') && 
                  !window.location.hostname.includes('127.0.0.1') &&
-                 !window.location.hostname.includes('dev');
+                 !window.location.hostname.includes('dev') : true;
 }
+
+// Export as App for main.ts compatibility
+export const App = AppComponent;

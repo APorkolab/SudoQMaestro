@@ -2,7 +2,6 @@ import { TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { of } from 'rxjs';
-import { runInInjectionContext } from '@angular/core';
 import { authGuard } from './auth.guard';
 import { AuthService, User } from '../services/auth.service';
 
@@ -37,7 +36,7 @@ describe('authGuard', () => {
   it('should allow access when user is authenticated', () => {
     authService.currentUser.and.returnValue(mockUser);
 
-    const result = TestBed.runInInjectionContext(() => authGuard({} as any, {} as any));
+    const result = TestBed.runInInjectionContext(() => authGuard({} as never, {} as never));
 
     expect(result).toBe(true);
     expect(router.navigate).not.toHaveBeenCalled();
@@ -46,7 +45,7 @@ describe('authGuard', () => {
   it('should redirect to home when user is not authenticated', () => {
     authService.currentUser.and.returnValue(null);
 
-    const result = TestBed.runInInjectionContext(() => authGuard({} as any, {} as any));
+    const result = TestBed.runInInjectionContext(() => authGuard({} as never, {} as never));
 
     expect(result).toBe(false);
     expect(router.navigate).toHaveBeenCalledWith(['/']);
@@ -56,10 +55,10 @@ describe('authGuard', () => {
     authService.currentUser.and.returnValue(undefined);
     authService.fetchCurrentUser.and.returnValue(of(mockUser));
 
-    const result = TestBed.runInInjectionContext(() => authGuard({} as any, {} as any));
+    const result = TestBed.runInInjectionContext(() => authGuard({} as never, {} as never));
 
     if (typeof result === 'object' && 'subscribe' in result) {
-      (result as any).subscribe((canActivate: boolean) => {
+      (result as unknown as { subscribe: (callback: (canActivate: boolean) => void) => void }).subscribe((canActivate: boolean) => {
         expect(canActivate).toBe(true);
         expect(authService.fetchCurrentUser).toHaveBeenCalled();
         expect(router.navigate).not.toHaveBeenCalled();
@@ -72,10 +71,10 @@ describe('authGuard', () => {
     authService.currentUser.and.returnValue(undefined);
     authService.fetchCurrentUser.and.returnValue(of(null));
 
-    const result = TestBed.runInInjectionContext(() => authGuard({} as any, {} as any));
+    const result = TestBed.runInInjectionContext(() => authGuard({} as never, {} as never));
 
     if (typeof result === 'object' && 'subscribe' in result) {
-      (result as any).subscribe((canActivate: boolean) => {
+      (result as unknown as { subscribe: (callback: (canActivate: boolean) => void) => void }).subscribe((canActivate: boolean) => {
         expect(canActivate).toBe(false);
         expect(authService.fetchCurrentUser).toHaveBeenCalled();
         expect(router.navigate).toHaveBeenCalledWith(['/']);
